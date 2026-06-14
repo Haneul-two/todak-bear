@@ -1,0 +1,10 @@
+# 빌드 산출물
+apps/desktop/node_modules/
+apps/desktop/src-tauri/target/
+apps/desktop/dist/
+
+# 런타임 상태 / 임시 파일
+.todak/
+_*.png
+*.tmp
+*.log

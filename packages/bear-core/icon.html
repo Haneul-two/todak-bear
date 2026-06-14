@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+  html,body{margin:0;width:512px;height:512px;background:transparent;overflow:hidden;}
+  #card{width:512px;height:512px;border-radius:110px;
+    background:radial-gradient(circle at 50% 38%, #FBEFD9 0%, #F1E2C6 100%);
+    display:flex;align-items:center;justify-content:center;}
+  #b{width:430px;height:430px;margin-top:18px;}
+  #b svg{width:100%;height:100%;}
+</style></head><body>
+  <div id="card"><div id="b"></div></div>
+  <script src="./cartoonbear.js"></script>
+  <script>document.getElementById('b').innerHTML = window.CartoonBear.buildSVG('cheerful',{laptop:false});</script>
+</body></html>
