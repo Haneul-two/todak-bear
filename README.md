@@ -23,6 +23,11 @@ apps/terminal          apps/github-profile     apps/desktop
 
 기존 `claude-code-bear-statusline`(이미 보유)이 이 우주의 네 번째 표면 — statusline 곰입니다.
 
+## 🌐 웹사이트 · 다운로드
+
+- **소개 페이지:** https://haneul-two.github.io/todak-bear/ (한국어/English)
+- **Windows 설치 파일:** [최신 릴리즈 다운로드](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe) (약 8&nbsp;MB) — 실행 시 SmartScreen 경고가 뜨면 `추가 정보 → 실행`(아직 코드서명 전 단계)
+
 ## 기분 사전 (위로 톤)
 
 | 상황 | 기분 | 곰의 한 마디 |
@@ -61,10 +66,11 @@ node apps/desktop/build-dist.js
 
 | 표면 | 상태 |
 |---|---|
-| bear-core | ✅ 완성·검증 (7기분 렌더 확인) |
+| bear-core | ✅ 완성·검증 (8기분 렌더 확인) |
 | #2 터미널 | ✅ 완성·검증 (성공/실패/영어 확인) |
 | #3 GitHub | ✅ 완성·검증 (카드 3종 + Action 워크플로) |
-| #1 데스크톱 | ✅ UI·Tauri 스캐폴드 완성 / ⏳ 실제 Tauri 빌드는 Rust 설치 후 |
+| #1 데스크톱 | ✅ **v0.1.0 출시** — Tauri 빌드·NSIS 설치 파일 [Release](https://github.com/Haneul-two/todak-bear/releases) 게시 |
+| 🌐 랜딩 | ✅ [GitHub Pages 라이브](https://haneul-two.github.io/todak-bear/) (KO/EN) |
 
 ## License
 MIT
