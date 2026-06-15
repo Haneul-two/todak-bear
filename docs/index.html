@@ -258,7 +258,7 @@
         <li><strong data-t="dl3_t">곰 만나기</strong>
           <span data-t="dl3_d">바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.</span></li>
       </ol>
-      <div class="note" data-t="dl_note">ⓘ 설치 파일이 의심스러우면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해 실행할 수도 있어요.</div>
+      <div class="note" data-t="dl_note">ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.</div>
     </div>
 
     <div class="panel" data-panel="source">
@@ -343,7 +343,7 @@ node apps/desktop/build-dist.js
       dl_btn:'⬇ Windows 설치 파일', dl_btn2:'모든 릴리즈 보기',
       dl2_t:'실행', dl2_d:'내려받은 설치 파일을 실행합니다. Windows SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요(서명 전 단계라 정상입니다).',
       dl3_t:'곰 만나기', dl3_d:'바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.',
-      dl_note:'ⓘ 설치 파일이 의심스러우면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해 실행할 수도 있어요.',
+      dl_note:'ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.',
       src1_t:'준비물 설치', src1_d:'<a href="https://nodejs.org">Node.js</a>와 <a href="https://rustup.rs">Rust</a>(rustup)를 설치합니다. Windows는 빌드 도구(MSVC)도 필요해요.',
       src2_t:'레포 클론 & 의존성', src3_t:'빌드 & 실행',
       src_note:'ⓘ 데스크톱 앱(<code class="inline">apps/desktop</code>)이 메인 표면이에요. 터미널 곰·GitHub 카드도 같은 레포에서 <code class="inline">node</code> 한 줄로 바로 체험할 수 있습니다.',
@@ -378,7 +378,7 @@ node apps/desktop/build-dist.js
       dl_btn:'⬇ Windows installer', dl_btn2:'All releases',
       dl2_t:'Run it', dl2_d:'Run the downloaded installer. If Windows SmartScreen warns you, click <code class="inline">More info → Run anyway</code> (expected — it isn’t code-signed yet).',
       dl3_t:'Meet the bear', dl3_d:'Todak appears at the bottom-right of your desktop. Left-click = cycle expressions, right-click = menu (toggle walking · reset position · quit), and you can drag it anywhere.',
-      dl_note:'ⓘ If you’d rather not trust the binary, build it yourself from the <strong>Build from source</strong> tab.',
+      dl_note:'ⓘ <strong>Verify integrity (SHA-256):</strong> after downloading, run <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> in PowerShell and check it matches <code class="inline">344ac433…7d876a02</code> from the <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">checksum file</a>. Still wary of the binary? Build it yourself from the <strong>Build from source</strong> tab.',
       src1_t:'Install prerequisites', src1_d:'Install <a href="https://nodejs.org">Node.js</a> and <a href="https://rustup.rs">Rust</a> (rustup). On Windows you’ll also need the MSVC build tools.',
       src2_t:'Clone & install deps', src3_t:'Build & run',
       src_note:'ⓘ The desktop app (<code class="inline">apps/desktop</code>) is the main surface. The terminal bear and GitHub card also run from the same repo with a single <code class="inline">node</code> command.',

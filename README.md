@@ -27,6 +27,7 @@ apps/terminal          apps/github-profile     apps/desktop
 
 - **소개 페이지:** https://haneul-two.github.io/todak-bear/ (한국어/English)
 - **Windows 설치 파일:** [최신 릴리즈 다운로드](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe) (약 8&nbsp;MB) — 실행 시 SmartScreen 경고가 뜨면 `추가 정보 → 실행`(아직 코드서명 전 단계)
+- **무결성 검증:** 다운로드 후 `Get-FileHash todak-bear_0.1.0_x64-setup.exe -Algorithm SHA256` 결과가 릴리즈의 [`.sha256` 체크섬](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256)과 같은지 확인하세요 (`344ac433…7d876a02`).
 
 ## 기분 사전 (위로 톤)
 
