@@ -54,13 +54,17 @@ node apps/terminal/todak-prompt.js --status 1     # 실패 → 안아주는 곰
 # #3 GitHub 카드
 node apps/github-profile/generate.js --commits 12 --out card.svg
 
-# #1 데스크톱 곰 (지금 당장: 브라우저로)
+# #1 데스크톱 곰 — ① 가장 쉬운 방법: 설치 파일 다운로드 (빌드 불필요)
+#   → 위 "웹사이트·다운로드"의 todak-bear_x64-setup.exe 받아 실행
+
+# #1 데스크톱 곰 — ② 설치 없이 브라우저로 미리보기 (Rust 불필요)
 node apps/desktop/build-dist.js
 #   → apps/desktop/dist/index.html 을 브라우저로 열기
 
-# #1 진짜 바탕화면 펫 (Rust 필요)
+# #1 데스크톱 곰 — ③ 소스에서 직접 빌드·실행 (Rust 필요)
 #   1) https://rustup.rs 로 Rust 설치
 #   2) cd apps/desktop && npm install && node build-dist.js && npm run dev
+#   3) 설치 파일 만들기: npm run build → src-tauri/target/release/bundle/nsis/
 ```
 
 ## 상태
