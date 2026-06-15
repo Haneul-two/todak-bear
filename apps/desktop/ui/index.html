@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🐻 토닥곰</title>
+<style>
+  :root { --fg: #9C8A7A; }
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  html, body { width: 100%; height: 100%; background: transparent; overflow: hidden;
+    font-family: ui-sans-serif, "Segoe UI", system-ui, sans-serif; }
+  #stage { width: 100%; height: 100%; display: flex; align-items: flex-end;
+    justify-content: center; padding-bottom: 8px; cursor: grab; }
+  #bear { position: relative; text-align: center; line-height: 1.15; transform-origin: bottom center;
+    animation: breathe 3.4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scaleY(1) translateY(0); }
+    50% { transform: scaleY(1.04) translateY(-2px); } }
+  /* 창 크기·DPI 줌과 무관하게 항상 여백 두고 들어가도록 뷰포트 비율로 상한.
+     (고정 px 높이는 WebView2 줌이 걸리면 폭이 창을 넘어 잘렸음 — 넓은 포즈 우측 잘림) */
+  #face { display: block; margin: 0 auto; width: auto; height: auto;
+    max-width: 74vw; max-height: 48vh; object-fit: contain; -webkit-user-drag: none;
+    transition: opacity .15s ease; filter: drop-shadow(0 4px 6px rgba(80,60,40,.18)); }
+  /* 어지러움: 잡고 휘두르면 빙글빙글 흔들 */
+  #face.dizzy { animation: dizzy .45s ease-in-out infinite; }
+  @keyframes dizzy { 0%{transform:rotate(-9deg)} 25%{transform:rotate(8deg)}
+    50%{transform:rotate(-7deg)} 75%{transform:rotate(9deg)} 100%{transform:rotate(-9deg)} }
+  /* 배회 중: walk_a/walk_b 다리 프레임이 보폭을 담당 → 몸은 가벼운 상하 바운스
+     + 진행 방향으로 살짝 기우는 리드(--lean, JS가 방향따라 설정) */
+  #bear.walking #face { animation: walkbob .52s ease-in-out infinite; }
+  @keyframes walkbob {
+    0%,100% { transform: translateY(0) rotate(var(--lean, 0deg)); }
+    50%     { transform: translateY(-5px) rotate(var(--lean, 0deg)); } }
+  /* 새벽(sleepy): cozy 바디에 밤 디밍 + 떠오르는 💤 로 휴식(cozy)과 구분 */
+  #face.sleeping { filter: brightness(.8) saturate(.62)
+    drop-shadow(0 4px 6px rgba(60,55,80,.28)); }
+  #zzz { position: absolute; top: 4px; left: 62%; font-size: 18px; opacity: 0;
+    pointer-events: none; }
+  #zzz.show { animation: floatz 2.6s ease-in-out infinite; }
+  @keyframes floatz { 0%{transform:translateY(0) rotate(-4deg); opacity:0}
+    35%{opacity:.85} 100%{transform:translateY(-20px) rotate(6deg); opacity:0} }
+  #bubble { position: relative; margin-bottom: 18px; max-width: 250px; white-space: normal;
+    background: #FFFDF8; color: #5A5048; border: 2px solid var(--fg); border-radius: 14px;
+    padding: 9px 13px; font-size: 13px; line-height: 1.4; opacity: 0; transform: translateY(6px);
+    transition: opacity .4s ease, transform .4s ease, border-color .6s ease;
+    box-shadow: 0 6px 18px rgba(90,80,72,.18); }
+  #bubble.show { opacity: 1; transform: translateY(0); }
+  #bubble::after { content: ""; position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%);
+    border: 8px solid transparent; border-top-color: var(--fg); }
+  #name { font-size: 11px; color: #B7ABA0; margin-top: 2px; letter-spacing: .5px; }
+  /* 우클릭 메뉴 — 곰 톤에 맞춘 커스텀 메뉴(네이티브 대신) */
+  #ctxmenu { position: fixed; z-index: 9999; min-width: 152px; padding: 5px;
+    background: #FFFDF8; border: 2px solid #D8CBB8; border-radius: 12px; color: #5A5048;
+    box-shadow: 0 8px 22px rgba(90,80,72,.28); font-size: 13px; display: none;
+    -webkit-app-region: no-drag; }
+  #ctxmenu.show { display: block; }
+  #ctxmenu .mi { padding: 7px 12px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+  #ctxmenu .mi:hover { background: #F1E9DC; }
+  #ctxmenu .mi.danger { color: #C0563C; }
+  #ctxmenu .sep { height: 1px; background: #ECE3D6; margin: 4px 6px; }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="bear">
+      <div id="bubble"><span id="msg"></span></div>
+      <div id="zzz">💤</div>
+      <img id="face" alt="토닥곰" />
+      <div id="name">토닥곰</div>
+    </div>
+  </div>
+
+  <div id="ctxmenu">
+    <div class="mi" data-act="pat">🐾 토닥 받기</div>
+    <div class="mi" data-act="cycle">😀 표정 구경하기</div>
+    <div class="mi" data-act="wander" id="mi-wander">🚶 산책 끄기</div>
+    <div class="sep"></div>
+    <div class="mi" data-act="reset">📍 위치 초기화</div>
+    <div class="mi" data-act="hide">🙈 잠깐 숨기기</div>
+    <div class="mi danger" data-act="quit">✕ 종료</div>
+  </div>
+
+  <script src="../../../packages/bear-core/todak.js"></script>
+  <script>
+    const T = window.Todak;
+    // 시스템 로케일 기준 언어 선택(영어권이면 en, 그 외 ko). 코어 메시지는 ko/en 둘 다 있음.
+    const LANG = (navigator.language || 'ko').toLowerCase().startsWith('en') ? 'en' : 'ko';
+    // 코어에 없는 UI 전용 문구(인사·어지러움)도 동일하게 ko/en 제공
+    const UI = {
+      greeting: { ko: '안녕! 옆에 있을게. 🐾', en: "Hi! I'm right here with you. 🐾" },
+      dizzy:    { ko: '우와… 빙글빙글, 너무 어지러워. 🌀', en: 'Whoa… round and round, so dizzy. 🌀' },
+      breakNudge: { ko: '한참 집중했네. 잠깐 차 한 잔 어때? ☕', en: "You've focused a while — time for a little break? ☕" },
+    };
+    const faceEl = document.getElementById('face');
+    const bubble = document.getElementById('bubble');
+    const msgEl  = document.getElementById('msg');
+    const bearEl = document.getElementById('bear');
+    const zzzEl  = document.getElementById('zzz');
+    const root   = document.documentElement;
+
+    // 기분 → 사용자 캐릭터(AI 도우미 곰) 포즈 이미지
+    const POSE = {
+      content: 'content',   // 집중(노트북)
+      cheerful:'cheerful',  // 기쁨
+      cheer:   'cheer',     // 응원(폼폼)
+      cozy:    'cozy',      // 휴식(담요·커피)
+      sleepy:  'sleepy',    // 전용 수면 포즈(담요·베개·💤 내장)
+      pat:     'pat',       // 응원/격려("잘하고 있어요")
+      hug:     'hug',       // 함께하기(하트·화분)
+      worried: 'worried',   // 깜짝
+    };
+    let current = null;
+    function setMood(key, { speak = true } = {}) {
+      current = key;
+      const m = T.getMood(key);
+      faceEl.src = 'poses/' + (POSE[key] || 'content') + '.png';
+      faceEl.classList.remove('sleeping'); // 전용 수면 아트에 담요·💤 내장 → 인위 디밍/💤 불필요
+      zzzEl.classList.remove('show');
+      root.style.setProperty('--fg', m.paletteObj.hex); // 말풍선·이름 색은 기분색
+      if (speak) say(T.line(key, LANG));
+    }
+    let hideTimer;
+    function say(text) {
+      msgEl.textContent = text;
+      bubble.classList.add('show');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => bubble.classList.remove('show'), 4200);
+    }
+
+    // 수동 표정(클릭·어지러움)은 잠깐 유지 — 자동 갱신이 곧바로 덮어쓰지 않게.
+    let manualUntil = 0;
+    let lastRaw = {}; // 마지막으로 받은 원시 상태(복귀 시 자동 기분 재적용에 사용)
+    let breakSt = {}; // 뽀모도로(휴식 넛지) 누적 상태
+    let dzTimer;
+    // 오래 집중하면 다그치지 않고 살짝 쉬어가자고 권유(휴식 포즈 cozy)
+    function nudgeBreak() {
+      setMood('cozy', { speak: false });
+      say(UI.breakNudge[LANG]);
+      manualUntil = Date.now() + 9000;
+    }
+    function showDizzy() {
+      current = 'worried';
+      faceEl.src = 'poses/surprised.png'; // 어지러움은 '깜짝' 표정 — 걱정(슬픔) 포즈와 구분
+      faceEl.classList.remove('sleeping'); zzzEl.classList.remove('show');
+      faceEl.classList.add('dizzy');
+      root.style.setProperty('--fg', T.getMood('worried').paletteObj.hex);
+      say(UI.dizzy[LANG]);
+      manualUntil = Date.now() + 4500;
+      clearTimeout(dzTimer);
+      dzTimer = setTimeout(() => faceEl.classList.remove('dizzy'), 4500);
+    }
+
+    // 첫 인사: '인사' 포즈로 손 흔들고 → 잠시 후 평소(집중)로
+    document.getElementById('name').textContent = T.TODAK.name[LANG]; // 토닥곰 / Todak
+    faceEl.src = 'poses/greeting.png';
+    current = 'content';
+    say(UI.greeting[LANG]);
+    setTimeout(() => { if (current === 'content') faceEl.src = 'poses/content.png'; }, 4500);
+
+    // 클릭하면 적용된 표정들을 순서대로 한 칸씩 넘김(갤러리처럼).
+    // 6초 동안 더 안 누르면 기본(자동 신호 기반)으로 복귀.
+    const CYCLE = ['greeting','content','cheerful','cheer','cozy','sleepy','pat','worried','hug','dizzy'];
+    let cycleIdx = -1;
+    let revertTimer;
+    function showExpression(key) {
+      faceEl.classList.remove('dizzy');
+      if (key === 'greeting') {                 // 인사 포즈(전용 기분 키 없음)
+        current = 'content';
+        faceEl.classList.remove('sleeping'); zzzEl.classList.remove('show');
+        faceEl.src = 'poses/greeting.png';
+        root.style.setProperty('--fg', T.getMood('content').paletteObj.hex);
+        say(UI.greeting[LANG]);
+      } else if (key === 'dizzy') {             // 깜짝 포즈 + 빙글
+        showDizzy();
+      } else {
+        setMood(key, { speak: true });
+      }
+    }
+    function holdManual() {
+      manualUntil = Date.now() + 6000;          // 6초간 자동 갱신 차단
+      clearTimeout(revertTimer);
+      revertTimer = setTimeout(() => {          // 6초간 안 누르면 기본으로 복귀
+        manualUntil = 0; cycleIdx = -1; applyState(lastRaw);
+      }, 6000);
+    }
+    function cycleNext() { cycleIdx = (cycleIdx + 1) % CYCLE.length; showExpression(CYCLE[cycleIdx]); holdManual(); }
+    function petBear() { setMood('pat'); holdManual(); }
+
+    // 원시 상태 → 기분. 기분이 "실제로 바뀔 때만" 갱신 → 신호 없으면 가만히.
+    // 데스크톱에선 유휴(stuck)로는 안 바뀌게 함: 훅/클릭/에러·완료·한도에만 반응.
+    function applyState(raw) {
+      if (Date.now() < manualUntil) return; // 수동 표정 유지 중엔 안 바꿈
+      raw = raw || {};
+      const s = T.deriveSignals(raw, Date.now(), new Date().getHours());
+      s.stuckMinutes = 0;
+      const key = T.pickMood(s);
+      if (key !== current) setMood(key, { speak: true });
+    }
+
+    const tau = window.__TAURI__;
+    if (tau && tau.event) {
+      // 실 신호: Tauri 백엔드가 ~/.todak/state.json 을 2초마다 보냄.
+      tau.event.listen('todak://state', (e) => { lastRaw = e.payload || {}; applyState(lastRaw); });
+      // 곰을 잡고 휘두르면(창 격한 이동) 백엔드가 보내는 어지러움 신호
+      tau.event.listen('todak://dizzy', () => showDizzy());
+      // 배회(산책) 중엔 walk_a ↔ walk_b 다리 프레임을 교차 → 진짜 걷는 모션
+      let walkTimer = null, walkFrame = 0;
+      tau.event.listen('todak://walk', (e) => {
+        const moving = !!(e.payload && e.payload.moving);
+        bearEl.classList.toggle('walking', moving);
+        // 진행 방향으로 살짝 기울임(왼쪽 -4°, 오른쪽 +4°)
+        if (moving) faceEl.style.setProperty('--lean', (e.payload.dir < 0 ? -4 : 4) + 'deg');
+        if (moving && !walkTimer) {
+          faceEl.classList.remove('sleeping', 'compact'); // 걷는 동안엔 그 처리 해제
+          walkFrame = 0; faceEl.src = 'poses/walk_a.png';
+          walkTimer = setInterval(() => {
+            walkFrame ^= 1;
+            faceEl.src = 'poses/walk_' + (walkFrame ? 'b' : 'a') + '.png';
+          }, 260);
+        } else if (!moving && walkTimer) {
+          clearInterval(walkTimer); walkTimer = null;
+          faceEl.style.removeProperty('--lean'); // 리드 해제
+          setMood(current, { speak: false }); // 멈추면 현재 기분 포즈로 복귀
+        }
+      });
+      // 우클릭 메뉴의 '산책 끄기/켜기' 라벨을 백엔드 상태에 맞춤
+      tau.event.listen('todak://wander', (e) => {
+        const on = !(e.payload && e.payload.enabled === false);
+        const mi = document.getElementById('mi-wander');
+        if (mi) mi.textContent = on ? '🚶 산책 끄기' : '🚶 산책 켜기';
+      });
+      // 밤/낮 시각 반영 + 수동표정 해제 후 복귀 위해 주기적 재평가
+      setInterval(() => applyState(lastRaw), 2500);
+      // 부드러운 뽀모도로: 30초마다 누적 집중 점검 → 임계(50분) 넘으면 휴식 권유
+      setInterval(() => {
+        const r = T.tickBreakNudge(breakSt, lastRaw.lastActivityAt, Date.now());
+        breakSt = r.st;
+        if (r.nudge) nudgeBreak();
+      }, 30000);
+    } else if (new URLSearchParams(location.search).has('demo')) {
+      // 브라우저 미리보기 전용(index.html?demo=1): 상황을 순회하며 보여줌.
+      const demo = [
+        { usage: 30 }, { event: { type: 'done', at: Date.now() } },
+        { event: { type: 'error', at: Date.now() } }, { usage: 92 }, { usage: 75 },
+      ];
+      let di = 0;
+      setInterval(() => applyState({ ...demo[di++ % demo.length] }), 5000);
+    }
+
+    // ── 우클릭 메뉴 ──
+    const ctx = document.getElementById('ctxmenu');
+    const hideMenu = () => ctx.classList.remove('show');
+    // 창 제어(종료·숨기기·위치초기화·산책토글)는 백엔드 커맨드 invoke로 호출(이벤트보다 확실)
+    function sendAction(cmd) {
+      if (tau && tau.core && tau.core.invoke) tau.core.invoke(cmd);
+    }
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      ctx.classList.add('show'); // 크기 측정 위해 먼저 표시
+      const mw = ctx.offsetWidth, mh = ctx.offsetHeight;
+      const x = Math.max(4, Math.min(e.clientX, window.innerWidth - mw - 4));
+      const y = Math.max(4, Math.min(e.clientY, window.innerHeight - mh - 4));
+      ctx.style.left = x + 'px';
+      ctx.style.top = y + 'px';
+    });
+    ctx.addEventListener('click', (e) => {
+      const mi = e.target.closest('.mi');
+      if (!mi) return;
+      e.stopPropagation();
+      hideMenu();
+      const act = mi.dataset.act;
+      if (act === 'pat') petBear();
+      else if (act === 'cycle') cycleNext();
+      else sendAction({ wander: 'toggle_wander', reset: 'reset_pos', hide: 'hide_window', quit: 'quit' }[act]);
+    });
+    document.addEventListener('click', hideMenu);          // 바깥 클릭 시 닫기
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideMenu(); });
+
+    // 앱영역 drag를 뺐으므로 좌드래그 창이동을 수동 구현(우클릭은 위 메뉴로 감).
+    // 좌클릭(이동 없음)=표정 순환 / 좌드래그(5px 이상 이동)=창 이동.
+    const appWin = (tau && tau.window && tau.window.getCurrentWindow) ? tau.window.getCurrentWindow() : null;
+    const stageEl = document.getElementById('stage');
+    let pressed = false, dragged = false, px = 0, py = 0;
+    stageEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      pressed = true; dragged = false; px = e.clientX; py = e.clientY;
+    });
+    stageEl.addEventListener('mousemove', (e) => {
+      if (!pressed || dragged) return;
+      if (Math.abs(e.clientX - px) + Math.abs(e.clientY - py) > 5) {
+        dragged = true;
+        if (appWin && appWin.startDragging) appWin.startDragging();
+      }
+    });
+    window.addEventListener('mouseup', () => { pressed = false; });
+    stageEl.addEventListener('click', () => { if (!dragged) cycleNext(); });
+    // 그 외(브라우저 일반 열기): 데모 없이 'content'로 가만히.
+  </script>
+</body>
+</html>

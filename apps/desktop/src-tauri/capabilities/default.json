@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "토닥곰 창이 백엔드 상태 이벤트를 수신할 수 있게 하는 권한",
+  "windows": ["todak"],
+  "permissions": [
+    "core:default",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "core:window:allow-start-dragging"
+  ]
+}

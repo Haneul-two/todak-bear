@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>토닥곰 (Todak) — 혼내지 않고 토닥이는 곰</title>
+<meta name="description" content="터미널·GitHub·바탕화면을 한 마리 곰이 따라다니는 곰 우주. 막히면 토닥이고, 에러 나면 안아주는 위로형 데스크톱 펫." />
+<meta property="og:title" content="토닥곰 (Todak) — 혼내지 않고 토닥이는 곰" />
+<meta property="og:description" content="막히면 토닥이고, 새벽이면 재워주고, 에러 나면 안아주는 위로형 데스크톱 펫." />
+<meta property="og:image" content="assets/poses/greeting.png" />
+<link rel="icon" type="image/png" href="assets/poses/cheerful.png" />
+<style>
+  :root{
+    --honey:#E8A33D; --sky:#6FA8C7; --leaf:#6FB36F; --amber:#D2683E;
+    --dusk:#7A6E8A; --fur:#9C8A7A;
+    --cream:#FBF6EE; --cream2:#F4EADb; --ink:#4A3F35; --ink-soft:#7A6E60;
+    --card:#FFFFFF; --line:#EADfce;
+    --radius:22px; --shadow:0 10px 30px rgba(120,90,50,.10);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:"Pretendard","Apple SD Gothic Neo","Segoe UI",system-ui,sans-serif;
+    color:var(--ink); background:var(--cream); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 24px}
+  .btn{
+    display:inline-flex; align-items:center; gap:.5em; cursor:pointer;
+    font-size:1.02rem; font-weight:700; text-decoration:none;
+    padding:.85em 1.6em; border-radius:999px; border:2px solid transparent;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:var(--honey); color:#fff; box-shadow:0 8px 20px rgba(232,163,61,.35)}
+  .btn-primary:hover{background:#dd9930}
+  .btn-ghost{background:#fff; color:var(--ink); border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--honey); color:var(--honey)}
+
+  /* ── HERO ── */
+  header.hero{
+    background:radial-gradient(1200px 500px at 50% -10%, #fff 0%, var(--cream) 55%);
+    padding:64px 0 40px; text-align:center; position:relative; overflow:hidden;
+  }
+  .nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:48px; gap:16px}
+  .brand{display:flex; align-items:center; gap:.55em; font-weight:800; font-size:1.15rem}
+  .brand img{width:38px; height:38px}
+  .nav-right{display:flex; align-items:center; gap:22px}
+  .nav-links{display:flex; gap:22px; font-weight:600; font-size:.96rem}
+  .nav-links a{text-decoration:none; color:var(--ink-soft); transition:color .12s}
+  .nav-links a:hover{color:var(--honey)}
+  .lang{display:inline-flex; border:2px solid var(--line); border-radius:999px; overflow:hidden; background:#fff}
+  .lang button{border:0; background:none; cursor:pointer; font-weight:700; font-size:.82rem;
+    padding:.35em .8em; color:var(--ink-soft)}
+  .lang button.on{background:var(--honey); color:#fff}
+  .hero-bear{width:210px; height:auto; filter:drop-shadow(0 14px 22px rgba(120,90,50,.18)); animation:bob 4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  h1{font-size:2.8rem; margin:.3em 0 .15em; letter-spacing:-.02em}
+  .tagline{font-size:1.25rem; color:var(--ink-soft); margin:0 0 6px; font-weight:600}
+  .speech{
+    display:inline-block; margin:18px 0 28px; background:#fff; border:2px solid var(--line);
+    padding:.7em 1.3em; border-radius:18px; font-size:1.02rem; box-shadow:var(--shadow); position:relative;
+  }
+  .speech::after{content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%) rotate(45deg);
+    width:16px; height:16px; background:#fff; border-left:2px solid var(--line); border-top:2px solid var(--line)}
+  .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap}
+  .platform-note{margin-top:14px; font-size:.85rem; color:var(--ink-soft)}
+
+  section{padding:72px 0}
+  .section-head{text-align:center; max-width:660px; margin:0 auto 44px}
+  .section-head h2{font-size:2rem; margin:0 0 .35em; letter-spacing:-.01em}
+  .section-head p{color:var(--ink-soft); font-size:1.08rem; margin:0}
+  .eyebrow{display:inline-block; font-weight:700; color:var(--honey); font-size:.82rem;
+    letter-spacing:.08em; text-transform:uppercase; margin-bottom:.6em}
+
+  .surfaces{display:grid; grid-template-columns:repeat(2,1fr); gap:20px}
+  .surf{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; box-shadow:var(--shadow)}
+  .surf .ico{font-size:1.6rem}
+  .surf h3{margin:.5em 0 .25em; font-size:1.15rem}
+  .surf p{margin:0; color:var(--ink-soft); font-size:.96rem}
+  .surf .core-tag{display:inline-block; margin-top:14px; font-size:.78rem; font-weight:700;
+    color:var(--sky); background:#eef5f9; padding:.3em .8em; border-radius:999px}
+
+  .moods{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+  .mood{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 16px 22px; text-align:center; box-shadow:var(--shadow);
+    transition:transform .14s ease, box-shadow .14s ease}
+  .mood:hover{transform:translateY(-6px); box-shadow:0 16px 34px rgba(120,90,50,.16)}
+  .mood img{width:104px; height:104px; object-fit:contain}
+  .mood .when{font-size:.78rem; font-weight:700; color:var(--honey); margin-top:8px}
+  .mood .face{font-family:"Cascadia Code",Consolas,monospace; color:var(--ink-soft); font-size:.92rem; margin:2px 0 6px}
+  .mood .line{font-size:.9rem; color:var(--ink)}
+
+  .why{background:var(--cream2)}
+  .why-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; max-width:820px; margin:0 auto}
+  .why-card{background:#fff; border-radius:var(--radius); padding:28px; border:1px solid var(--line)}
+  .why-card.bad{opacity:.72}
+  .why-card h3{margin:0 0 .5em; font-size:1.1rem}
+  .why-card.bad h3{color:var(--amber)}
+  .why-card.good h3{color:var(--leaf)}
+  .why-card ul{margin:0; padding-left:1.2em; color:var(--ink-soft)}
+  .why-card li{margin:.4em 0}
+
+  .install{background:linear-gradient(180deg,var(--cream) 0%,#fff 100%)}
+  .install-tabs{display:flex; gap:10px; justify-content:center; margin-bottom:28px; flex-wrap:wrap}
+  .tab{cursor:pointer; padding:.7em 1.4em; border-radius:999px; border:2px solid var(--line);
+    background:#fff; font-weight:700; font-size:.95rem; color:var(--ink-soft); transition:all .12s}
+  .tab.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .panel{display:none; max-width:760px; margin:0 auto}
+  .panel.active{display:block}
+  .steps{counter-reset:step; list-style:none; padding:0; margin:0}
+  .steps li{position:relative; padding:18px 18px 18px 64px; background:#fff; border:1px solid var(--line);
+    border-radius:16px; margin-bottom:14px}
+  .steps li::before{counter-increment:step; content:counter(step); position:absolute; left:18px; top:18px;
+    width:30px; height:30px; background:var(--honey); color:#fff; border-radius:50%;
+    display:grid; place-items:center; font-weight:800; font-size:.95rem}
+  .steps strong{display:block; margin-bottom:6px}
+  code, pre{font-family:"Cascadia Code",Consolas,monospace}
+  pre{background:#2c2622; color:#f3ead9; padding:14px 16px; border-radius:12px; overflow-x:auto;
+    font-size:.88rem; margin:8px 0 0; line-height:1.7; white-space:pre-wrap}
+  pre .c{color:#a99}
+  code.inline{background:var(--cream2); padding:.15em .45em; border-radius:6px; font-size:.9em}
+  .note{max-width:760px; margin:26px auto 0; background:#fff7e8; border:1px solid #f0d9a8;
+    border-radius:14px; padding:16px 18px; font-size:.92rem; color:#8a6d2f}
+
+  footer{background:var(--ink); color:#e9ddcf; padding:48px 0 40px; text-align:center}
+  footer .brand{justify-content:center; color:#fff; margin-bottom:10px}
+  footer a{color:var(--honey); text-decoration:none}
+  footer .muted{color:#a99884; font-size:.88rem; margin-top:10px}
+
+  @media (max-width:760px){
+    h1{font-size:2.1rem}
+    .nav-links{display:none}
+    .surfaces{grid-template-columns:1fr}
+    .moods{grid-template-columns:repeat(2,1fr)}
+    .why-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand"><img src="assets/poses/cheerful.png" alt="Todak"/> <span data-t="brand">토닥곰</span></div>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#surfaces" data-t="nav_surfaces">표면</a>
+          <a href="#moods" data-t="nav_moods">기분</a>
+          <a href="#why" data-t="nav_why">왜 다른가</a>
+          <a href="#install" data-t="nav_install">설치</a>
+          <a href="https://github.com/Haneul-two/todak-bear">GitHub</a>
+        </div>
+        <div class="lang" role="group" aria-label="language">
+          <button data-lang="ko">KO</button><button data-lang="en">EN</button>
+        </div>
+      </div>
+    </nav>
+
+    <img class="hero-bear" src="assets/poses/greeting.png" alt="Todak waving" />
+    <h1><span data-t="brand">토닥곰</span> <span data-t="rom" style="font-weight:500;color:var(--ink-soft)">Todak</span></h1>
+    <p class="tagline" data-t="tagline">혼내지 않고 토닥이는 곰</p>
+    <div class="speech" data-t="speech">“괜찮아, 막힐 수도 있지. 같이 해보자. 🐾”</div>
+    <div class="cta">
+      <a class="btn btn-primary" href="#install" data-t="cta_install">⬇ 설치하기</a>
+      <a class="btn btn-ghost" href="#moods" data-t="cta_browse">기분 둘러보기</a>
+    </div>
+    <p class="platform-note" data-t="platform">Windows 10/11 · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)</p>
+  </div>
+</header>
+
+<section id="surfaces">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">One bear, everywhere</span>
+      <h2 data-t="surf_title">한 마리 곰, 네 개의 표면</h2>
+      <p data-t="surf_desc">코어 하나에 곰의 표정·기분·대사가 들어 있고, 터미널·GitHub·바탕화면이 같은 곰을 그대로 가져갑니다. 어디서 만나도 같은 캐릭터예요.</p>
+    </div>
+    <div class="surfaces">
+      <div class="surf"><div class="ico">🖥️</div>
+        <h3 data-t="s1_t">바탕화면 펫</h3>
+        <p data-t="s1_d">화면을 떠다니며 산책하고, 클릭하면 표정을 바꿔요. 작업 신호를 읽어 기분으로 반응합니다.</p>
+        <span class="core-tag" data-t="s1_tag">Tauri · 메인 표면</span></div>
+      <div class="surf"><div class="ico">⌨️</div>
+        <h3 data-t="s2_t">터미널 곰</h3>
+        <p data-t="s2_d">직전 명령의 종료코드와 시각을 보고 한 줄 프롬프트로 반응 — 실패하면 안아주는 곰.</p>
+        <span class="core-tag" data-t="s2_tag">Node 한 줄 프롬프트</span></div>
+      <div class="surf"><div class="ico">📊</div>
+        <h3 data-t="s3_t">GitHub 카드</h3>
+        <p data-t="s3_d">이번 주 커밋 수를 기분으로 바꿔 SVG 프로필 카드로 — GitHub Action으로 자동 갱신.</p>
+        <span class="core-tag" data-t="s3_tag">SVG · Action</span></div>
+      <div class="surf"><div class="ico">📟</div>
+        <h3 data-t="s4_t">Statusline 곰</h3>
+        <p data-t="s4_d">Claude Code 상태줄에서 한도·비용을 살피며 같은 톤으로 곁을 지킵니다.</p>
+        <span class="core-tag" data-t="s4_tag">statusline</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="moods" style="background:var(--cream2)">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Mood dictionary</span>
+      <h2 data-t="mood_title">지금 네 상태를 읽고, 곰이 토닥여요</h2>
+      <p data-t="mood_desc">한도·에러·막힘·시각 같은 작업 신호를 8가지 기분으로 바꿔 표정과 한 마디를 건넵니다. 메시지는 전부 위로·응원 톤 — 절대 혼내지 않아요.</p>
+    </div>
+    <div class="moods" id="moodGrid"></div>
+  </div>
+</section>
+
+<section id="why" class="why">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Why Todak</span>
+      <h2 data-t="why_title">다그치는 펫이 아니라, 곁에 있는 곰</h2>
+      <p data-t="why_desc">흔한 코딩 펫은 “잘못하면 화내는” 캐릭터예요. 토닥곰은 정반대 방향을 골랐습니다.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card bad">
+        <h3 data-t="bad_t">😤 보통의 펫</h3>
+        <ul data-t="bad_list"><li>에러 나면 토라지고 체력이 깎임</li><li>오래 멈추면 삐지거나 죽음</li><li>“또 틀렸네” 식의 다그침</li><li>실수를 벌점으로 환산</li></ul>
+      </div>
+      <div class="why-card good">
+        <h3 data-t="good_t">🤗 토닥곰</h3>
+        <ul data-t="good_list"><li>에러 나면 → <strong>안아줌</strong></li><li>오래 막히면 → <strong>토닥토닥</strong></li><li>새벽이면 → <strong>이제 자도 괜찮아</strong></li><li>해내면 → <strong>정말 잘했어!</strong></li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="install">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Get Todak</span>
+      <h2 data-t="inst_title">토닥곰 데려오기</h2>
+      <p data-t="inst_desc">바로 받아 실행하거나, 소스에서 직접 빌드할 수 있어요.</p>
+    </div>
+
+    <div class="install-tabs">
+      <div class="tab active" data-tab="download" data-t="tab_dl">⬇ 다운로드 (Windows)</div>
+      <div class="tab" data-tab="source" data-t="tab_src">🛠 소스에서 빌드</div>
+      <div class="tab" data-tab="try" data-t="tab_try">👀 브라우저로 먼저 보기</div>
+    </div>
+
+    <div class="panel active" data-panel="download">
+      <ol class="steps">
+        <li><strong data-t="dl1_t">설치 파일 받기</strong>
+          <span data-t="dl1_d">아래 버튼으로 최신 Windows 설치 파일(<code class="inline">todak-bear_x64-setup.exe</code>, 약 8&nbsp;MB)을 내려받으세요.</span>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+            <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe" data-t="dl_btn">⬇ Windows 설치 파일</a>
+            <a class="btn btn-ghost" href="https://github.com/Haneul-two/todak-bear/releases" data-t="dl_btn2">모든 릴리즈 보기</a>
+          </div>
+        </li>
+        <li><strong data-t="dl2_t">실행</strong>
+          <span data-t="dl2_d">내려받은 설치 파일을 실행합니다. Windows SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요(서명 전 단계라 정상입니다).</span></li>
+        <li><strong data-t="dl3_t">곰 만나기</strong>
+          <span data-t="dl3_d">바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.</span></li>
+      </ol>
+      <div class="note" data-t="dl_note">ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.</div>
+    </div>
+
+    <div class="panel" data-panel="source">
+      <ol class="steps">
+        <li><strong data-t="src1_t">준비물 설치</strong>
+          <span data-t="src1_d"><a href="https://nodejs.org">Node.js</a>와 <a href="https://rustup.rs">Rust</a>(rustup)를 설치합니다. Windows는 빌드 도구(MSVC)도 필요해요.</span></li>
+        <li><strong data-t="src2_t">레포 클론 & 의존성</strong>
+          <pre data-t="src2_code"><span class="c"># 저장소 받기</span>
+git clone https://github.com/Haneul-two/todak-bear
+cd todak-bear/apps/desktop
+npm install</pre></li>
+        <li><strong data-t="src3_t">빌드 & 실행</strong>
+          <pre data-t="src3_code"><span class="c"># 곰 에셋을 dist로 조립한 뒤 데스크톱 앱 실행</span>
+node build-dist.js
+npm run dev</pre></li>
+      </ol>
+      <div class="note" data-t="src_note">ⓘ 데스크톱 앱(<code class="inline">apps/desktop</code>)이 메인 표면이에요. 터미널 곰·GitHub 카드도 같은 레포에서 <code class="inline">node</code> 한 줄로 바로 체험할 수 있습니다.</div>
+    </div>
+
+    <div class="panel" data-panel="try">
+      <ol class="steps">
+        <li><strong data-t="try1_t">설치 없이 코어 데모</strong>
+          <span data-t="try1_d">Rust 없이도 곰의 모든 기분을 브라우저/터미널로 미리 볼 수 있어요.</span>
+          <pre data-t="try1_code"><span class="c"># 모든 기분 한 번에</span>
+node packages/bear-core/demo.js
+
+<span class="c"># 데스크톱 UI를 브라우저로 (Rust 불필요)</span>
+node apps/desktop/build-dist.js
+<span class="c"># → apps/desktop/dist/index.html 을 브라우저로 열기</span></pre></li>
+        <li><strong data-t="try2_t">마음에 들면</strong>
+          <span data-t="try2_d">위 <strong>다운로드</strong> 또는 <strong>소스에서 빌드</strong> 탭으로 진짜 바탕화면 펫을 데려오세요. 🐾</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><img src="assets/poses/cheer.png" alt="" style="width:34px;height:34px"/> <span data-t="brand">토닥곰</span></div>
+    <p><span data-t="tagline">혼내지 않고 토닥이는 곰</span> · <a href="https://github.com/Haneul-two/todak-bear">GitHub</a></p>
+    <p class="muted">MIT License · Made with 🍯 for tired developers</p>
+  </div>
+</footer>
+
+<script>
+  // ── 기분 사전 (bear-core/todak.js MOODS 미러, ko/en) ──
+  const MOODS = [
+    {key:'cheerful', when:{ko:'활발할 때',en:'On a roll'},     face:'◕ᴥ◕', line:{ko:'좋아, 오늘 컨디션 최고야! 🐾',en:"We're on a roll today! 🐾"}},
+    {key:'content',  when:{ko:'꾸준할 때',en:'Steady'},        face:'•ᴥ•', line:{ko:'잘 하고 있어, 천천히 가보자.',en:'Steady and good. No rush.'}},
+    {key:'cozy',     when:{ko:'한도 70%↑',en:'Usage 70%+'},    face:'˘ᴥ˘', line:{ko:'따뜻한 차 한 잔 어때? ☕',en:'How about a warm cup of tea? ☕'}},
+    {key:'pat',      when:{ko:'10분↑ 막힘',en:'Stuck 10min+'},  face:'ᵔᴥᵔ', line:{ko:'괜찮아, 막힐 수도 있지. 같이 해보자. 🐾',en:"It's okay to get stuck. Let's try together. 🐾"}},
+    {key:'cheer',    when:{ko:'해냈을 때',en:'You did it'},     face:'≧ᴥ≦', line:{ko:'해냈다! 정말 잘했어! 👏',en:'You did it! Well done! 👏'}},
+    {key:'sleepy',   when:{ko:'새벽 1~6시',en:'1–6 AM'},        face:'-ᴥ-', line:{ko:'늦었네… 이제 자도 괜찮아. 🌙',en:"It's late… it's okay to rest now. 🌙"}},
+    {key:'worried',  when:{ko:'한도 90%↑',en:'Usage 90%+'},    face:'ᵕᴥᵕ', line:{ko:'조금만 아껴 쓰자, 무리하지 말고. 💛',en:"Let's pace ourselves, no overdoing it. 💛"}},
+    {key:'hug',      when:{ko:'에러 났을 때',en:'On error'},    face:'ᴗᴥᴗ', line:{ko:'에러 났구나. 자, 안아줄게. 🤗',en:"An error, huh. Here's a hug. 🤗"}},
+  ];
+
+  // ── 정적 텍스트 사전 ──
+  const STR = {
+    ko: {
+      brand:'토닥곰', rom:'Todak', nav_surfaces:'표면', nav_moods:'기분', nav_why:'왜 다른가', nav_install:'설치',
+      tagline:'혼내지 않고 토닥이는 곰', speech:'“괜찮아, 막힐 수도 있지. 같이 해보자. 🐾”',
+      cta_install:'⬇ 설치하기', cta_browse:'기분 둘러보기',
+      platform:'Windows 10/11 · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)',
+      surf_title:'한 마리 곰, 네 개의 표면',
+      surf_desc:'코어 하나에 곰의 표정·기분·대사가 들어 있고, 터미널·GitHub·바탕화면이 같은 곰을 그대로 가져갑니다. 어디서 만나도 같은 캐릭터예요.',
+      s1_t:'바탕화면 펫', s1_d:'화면을 떠다니며 산책하고, 클릭하면 표정을 바꿔요. 작업 신호를 읽어 기분으로 반응합니다.', s1_tag:'Tauri · 메인 표면',
+      s2_t:'터미널 곰', s2_d:'직전 명령의 종료코드와 시각을 보고 한 줄 프롬프트로 반응 — 실패하면 안아주는 곰.', s2_tag:'Node 한 줄 프롬프트',
+      s3_t:'GitHub 카드', s3_d:'이번 주 커밋 수를 기분으로 바꿔 SVG 프로필 카드로 — GitHub Action으로 자동 갱신.', s3_tag:'SVG · Action',
+      s4_t:'Statusline 곰', s4_d:'Claude Code 상태줄에서 한도·비용을 살피며 같은 톤으로 곁을 지킵니다.', s4_tag:'statusline',
+      mood_title:'지금 네 상태를 읽고, 곰이 토닥여요',
+      mood_desc:'한도·에러·막힘·시각 같은 작업 신호를 8가지 기분으로 바꿔 표정과 한 마디를 건넵니다. 메시지는 전부 위로·응원 톤 — 절대 혼내지 않아요.',
+      why_title:'다그치는 펫이 아니라, 곁에 있는 곰',
+      why_desc:'흔한 코딩 펫은 “잘못하면 화내는” 캐릭터예요. 토닥곰은 정반대 방향을 골랐습니다.',
+      bad_t:'😤 보통의 펫',
+      bad_list:'<li>에러 나면 토라지고 체력이 깎임</li><li>오래 멈추면 삐지거나 죽음</li><li>“또 틀렸네” 식의 다그침</li><li>실수를 벌점으로 환산</li>',
+      good_t:'🤗 토닥곰',
+      good_list:'<li>에러 나면 → <strong>안아줌</strong></li><li>오래 막히면 → <strong>토닥토닥</strong></li><li>새벽이면 → <strong>이제 자도 괜찮아</strong></li><li>해내면 → <strong>정말 잘했어!</strong></li>',
+      inst_title:'토닥곰 데려오기', inst_desc:'바로 받아 실행하거나, 소스에서 직접 빌드할 수 있어요.',
+      tab_dl:'⬇ 다운로드 (Windows)', tab_src:'🛠 소스에서 빌드', tab_try:'👀 브라우저로 먼저 보기',
+      dl1_t:'설치 파일 받기', dl1_d:'아래 버튼으로 최신 Windows 설치 파일(<code class="inline">todak-bear_x64-setup.exe</code>, 약 8&nbsp;MB)을 내려받으세요.',
+      dl_btn:'⬇ Windows 설치 파일', dl_btn2:'모든 릴리즈 보기',
+      dl2_t:'실행', dl2_d:'내려받은 설치 파일을 실행합니다. Windows SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요(서명 전 단계라 정상입니다).',
+      dl3_t:'곰 만나기', dl3_d:'바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.',
+      dl_note:'ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.',
+      src1_t:'준비물 설치', src1_d:'<a href="https://nodejs.org">Node.js</a>와 <a href="https://rustup.rs">Rust</a>(rustup)를 설치합니다. Windows는 빌드 도구(MSVC)도 필요해요.',
+      src2_t:'레포 클론 & 의존성', src3_t:'빌드 & 실행',
+      src_note:'ⓘ 데스크톱 앱(<code class="inline">apps/desktop</code>)이 메인 표면이에요. 터미널 곰·GitHub 카드도 같은 레포에서 <code class="inline">node</code> 한 줄로 바로 체험할 수 있습니다.',
+      try1_t:'설치 없이 코어 데모', try1_d:'Rust 없이도 곰의 모든 기분을 브라우저/터미널로 미리 볼 수 있어요.',
+      try2_t:'마음에 들면', try2_d:'위 <strong>다운로드</strong> 또는 <strong>소스에서 빌드</strong> 탭으로 진짜 바탕화면 펫을 데려오세요. 🐾',
+      src2_code:'<span class="c"># 저장소 받기</span>\ngit clone https://github.com/Haneul-two/todak-bear\ncd todak-bear/apps/desktop\nnpm install',
+      src3_code:'<span class="c"># 곰 에셋을 dist로 조립한 뒤 데스크톱 앱 실행</span>\nnode build-dist.js\nnpm run dev',
+      try1_code:'<span class="c"># 모든 기분 한 번에</span>\nnode packages/bear-core/demo.js\n\n<span class="c"># 데스크톱 UI를 브라우저로 (Rust 불필요)</span>\nnode apps/desktop/build-dist.js\n<span class="c"># → apps/desktop/dist/index.html 을 브라우저로 열기</span>',
+    },
+    en: {
+      brand:'Todak', rom:'', nav_surfaces:'Surfaces', nav_moods:'Moods', nav_why:'Why', nav_install:'Install',
+      tagline:'The bear that comforts, never scolds', speech:'“It’s okay to get stuck. Let’s try together. 🐾”',
+      cta_install:'⬇ Install', cta_browse:'Browse moods',
+      platform:'Windows 10/11 · lightweight Tauri desktop pet · open source (MIT)',
+      surf_title:'One bear, four surfaces',
+      surf_desc:'A single core holds the bear’s faces, moods, and lines — the terminal, GitHub, and desktop all pull the very same bear. Same character wherever you meet it.',
+      s1_t:'Desktop pet', s1_d:'Floats around, takes little walks, and changes expression on click. Reads your work signals and reacts with moods.', s1_tag:'Tauri · main surface',
+      s2_t:'Terminal bear', s2_d:'Reads the last command’s exit code and the time, replying in a one-line prompt — hugs you when it fails.', s2_tag:'Node one-line prompt',
+      s3_t:'GitHub card', s3_d:'Turns this week’s commit count into a mood on an SVG profile card — auto-refreshed by a GitHub Action.', s3_tag:'SVG · Action',
+      s4_t:'Statusline bear', s4_d:'Watches usage and cost in the Claude Code statusline, keeping you company in the same tone.', s4_tag:'statusline',
+      mood_title:'It reads where you are, and pats you',
+      mood_desc:'Work signals — usage, errors, being stuck, the hour — become 8 moods, each with a face and a word. Every message is comforting and encouraging, never scolding.',
+      why_title:'Not a nagging pet, but a bear by your side',
+      why_desc:'The usual coding pet is a “gets angry when you slip” character. Todak chose the opposite direction.',
+      bad_t:'😤 The usual pet',
+      bad_list:'<li>Sulks and loses HP on errors</li><li>Gets upset or dies if you pause too long</li><li>“Wrong again” style nagging</li><li>Turns mistakes into penalty points</li>',
+      good_t:'🤗 Todak',
+      good_list:'<li>On error → <strong>gives a hug</strong></li><li>Stuck a while → <strong>pat, pat</strong></li><li>Late at night → <strong>it’s okay to rest</strong></li><li>You made it → <strong>well done!</strong></li>',
+      inst_title:'Bring Todak home', inst_desc:'Grab it and run, or build it straight from source.',
+      tab_dl:'⬇ Download (Windows)', tab_src:'🛠 Build from source', tab_try:'👀 Preview in browser',
+      dl1_t:'Get the installer', dl1_d:'Use the button below to download the latest Windows installer (<code class="inline">todak-bear_x64-setup.exe</code>, ~8&nbsp;MB).',
+      dl_btn:'⬇ Windows installer', dl_btn2:'All releases',
+      dl2_t:'Run it', dl2_d:'Run the downloaded installer. If Windows SmartScreen warns you, click <code class="inline">More info → Run anyway</code> (expected — it isn’t code-signed yet).',
+      dl3_t:'Meet the bear', dl3_d:'Todak appears at the bottom-right of your desktop. Left-click = cycle expressions, right-click = menu (toggle walking · reset position · quit), and you can drag it anywhere.',
+      dl_note:'ⓘ <strong>Verify integrity (SHA-256):</strong> after downloading, run <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> in PowerShell and check it matches <code class="inline">344ac433…7d876a02</code> from the <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">checksum file</a>. Still wary of the binary? Build it yourself from the <strong>Build from source</strong> tab.',
+      src1_t:'Install prerequisites', src1_d:'Install <a href="https://nodejs.org">Node.js</a> and <a href="https://rustup.rs">Rust</a> (rustup). On Windows you’ll also need the MSVC build tools.',
+      src2_t:'Clone & install deps', src3_t:'Build & run',
+      src_note:'ⓘ The desktop app (<code class="inline">apps/desktop</code>) is the main surface. The terminal bear and GitHub card also run from the same repo with a single <code class="inline">node</code> command.',
+      try1_t:'Core demo, no install', try1_d:'See every mood of the bear in your browser/terminal — no Rust required.',
+      try2_t:'Like it?', try2_d:'Use the <strong>Download</strong> or <strong>Build from source</strong> tab above to bring the real desktop pet home. 🐾',
+      src2_code:'<span class="c"># clone the repo</span>\ngit clone https://github.com/Haneul-two/todak-bear\ncd todak-bear/apps/desktop\nnpm install',
+      src3_code:'<span class="c"># assemble bear assets into dist, then run the desktop app</span>\nnode build-dist.js\nnpm run dev',
+      try1_code:'<span class="c"># all moods at once</span>\nnode packages/bear-core/demo.js\n\n<span class="c"># desktop UI in the browser (no Rust)</span>\nnode apps/desktop/build-dist.js\n<span class="c"># → open apps/desktop/dist/index.html in a browser</span>',
+    }
+  };
+
+  let LANG = 'ko';
+  const saved = localStorage.getItem('todak-lang');
+  if(saved === 'ko' || saved === 'en') LANG = saved;
+  else if((navigator.language || 'ko').toLowerCase().startsWith('en')) LANG = 'en';
+
+  function renderMoods(){
+    document.getElementById('moodGrid').innerHTML = MOODS.map(m => `
+      <div class="mood">
+        <img src="assets/poses/${m.key}.png" alt="${m.when[LANG]} Todak" loading="lazy"/>
+        <div class="when">${m.when[LANG]}</div>
+        <div class="face">${m.face}</div>
+        <div class="line">${m.line[LANG]}</div>
+      </div>`).join('');
+  }
+  function applyLang(){
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-t]').forEach(el => {
+      const v = STR[LANG][el.dataset.t];
+      if(v !== undefined) el.innerHTML = v;
+    });
+    document.querySelectorAll('.lang button').forEach(b =>
+      b.classList.toggle('on', b.dataset.lang === LANG));
+    renderMoods();
+  }
+  document.querySelectorAll('.lang button').forEach(b =>
+    b.addEventListener('click', () => {
+      LANG = b.dataset.lang; localStorage.setItem('todak-lang', LANG); applyLang();
+    }));
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+    });
+  });
+
+  applyLang();
+</script>
+</body>
+</html>

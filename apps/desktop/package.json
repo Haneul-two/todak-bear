@@ -1,0 +1,13 @@
+{
+  "name": "todak-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "🐻 토닥곰 데스크톱 펫 (Tauri)",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

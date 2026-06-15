@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+  body{margin:0;background:#FBF6EC;font-family:"Segoe UI",sans-serif;}
+  .row{display:flex;flex-wrap:wrap;width:1000px;}
+  .cell{width:200px;height:250px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;}
+  .cell svg{width:165px;height:175px;}
+  .lbl{margin-top:8px;font-size:16px;font-weight:800;color:#5A4A38;}
+  .sub{font-size:11px;color:#8A7A66;margin-top:2px;text-align:center;}
+</style></head><body><div class="row" id="root"></div>
+<script>
+function bear(o){
+  const fur=o.fur, cream=o.cream, out=o.out, sw=o.sw||0, eye=o.eye||'dot';
+  const O = sw? `stroke="${out}" stroke-width="${sw}" stroke-linejoin="round"`:'';
+  const Ot = sw? `stroke="${out}" stroke-width="${Math.max(1,sw*0.7)}" stroke-linejoin="round"`:'';
+  const E='#3A2A1E', W='#fff';
+  function eyes(){
+    if(eye==='big') return `<ellipse cx="50" cy="52" rx="7" ry="9" fill="${E}"/><circle cx="47.5" cy="49" r="2.6" fill="${W}"/>`+
+      `<ellipse cx="70" cy="52" rx="7" ry="9" fill="${E}"/><circle cx="67.5" cy="49" r="2.6" fill="${W}"/>`;
+    return `<ellipse cx="50" cy="53" rx="3.4" ry="4.2" fill="${E}"/><circle cx="48.8" cy="51.3" r="1.1" fill="${W}"/>`+
+      `<ellipse cx="70" cy="53" rx="3.4" ry="4.2" fill="${E}"/><circle cx="68.8" cy="51.3" r="1.1" fill="${W}"/>`;
+  }
+  const foot=(cx)=>`<ellipse cx="${cx}" cy="118" rx="15" ry="11" fill="${fur}" ${O}/>`+
+    `<ellipse cx="${cx}" cy="120" rx="7" ry="5" fill="${cream}" ${Ot}/>`+
+    `<circle cx="${cx-6}" cy="112" r="2" fill="${cream}" ${Ot}/><circle cx="${cx}" cy="110.5" r="2" fill="${cream}" ${Ot}/><circle cx="${cx+6}" cy="112" r="2" fill="${cream}" ${Ot}/>`;
+  return `<svg viewBox="0 0 120 132">
+    ${foot(28)}${foot(92)}
+    <ellipse cx="60" cy="98" rx="42" ry="32" fill="${fur}" ${O}/>
+    <ellipse cx="60" cy="102" rx="22" ry="24" fill="${cream}"/>
+    <ellipse cx="26" cy="86" rx="11" ry="13" fill="${fur}" ${O}/><ellipse cx="94" cy="86" rx="11" ry="13" fill="${fur}" ${O}/>
+    <circle cx="30" cy="26" r="14" fill="${fur}" ${O}/><circle cx="90" cy="26" r="14" fill="${fur}" ${O}/>
+    <circle cx="30" cy="26" r="7" fill="${cream}" ${Ot}/><circle cx="90" cy="26" r="7" fill="${cream}" ${Ot}/>
+    <ellipse cx="60" cy="50" rx="38" ry="36" fill="${fur}" ${O}/>
+    <ellipse cx="60" cy="62" rx="18" ry="13" fill="${cream}"/>
+    ${o.blush?`<ellipse cx="38" cy="58" rx="7" ry="4" fill="#E89A9A" opacity=".6"/><ellipse cx="82" cy="58" rx="7" ry="4" fill="#E89A9A" opacity=".6"/>`:''}
+    ${eyes()}
+    <ellipse cx="60" cy="57" rx="4.5" ry="3.4" fill="#3A2A1E"/>
+    <path d="M55,62 Q60,67 65,62" stroke="#3A2A1E" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    ${o.extra||''}
+  </svg>`;
+}
+const beanie = `<path d="M26,24 Q60,-8 94,24 Z" fill="#C56B6B"/><rect x="24" y="20" width="72" height="9" rx="4" fill="#A85555"/><circle cx="60" cy="-2" r="5" fill="#E8C9C9"/>`;
+const mug = `<rect x="74" y="92" width="20" height="18" rx="3" fill="#D98C5A" stroke="#7E5636" stroke-width="2"/><path d="M94,96 q8,2 0,10" fill="none" stroke="#7E5636" stroke-width="2"/><path d="M80,88 q2,-4 4,0 M86,88 q2,-4 4,0" stroke="#cdb89a" stroke-width="1.5" fill="none"/>`;
+
+const opts=[
+  {label:'1. 모찌 갈색곰',sub:'외곽선X·미니멀·말랑',fur:'#C79A6E',cream:'#F2E6D2',sw:0,eye:'dot',blush:true},
+  {label:'2. 회갈색 곰',sub:'그리즈리풍 회갈색',fur:'#9E8C78',cream:'#E9DECB',out:'#6E6253',sw:2,eye:'dot',blush:true},
+  {label:'3. 크림 베이지곰',sub:'밝은 크림·폭신',fur:'#E0C49A',cream:'#F6ECDA',out:'#B79A6E',sw:1.8,eye:'dot',blush:true},
+  {label:'4. 비니 쓴 곰',sub:'갈색곰+니트모자',fur:'#A9774E',cream:'#EBD7BD',out:'#7E5636',sw:1.8,eye:'dot',blush:true,extra:beanie},
+  {label:'5. 커피 곰',sub:'갈색곰+머그컵',fur:'#A9774E',cream:'#EBD7BD',out:'#7E5636',sw:1.8,eye:'dot',blush:true,extra:mug},
+];
+document.getElementById('root').innerHTML = opts.map(o=>
+  `<div class="cell">${bear(o)}<div class="lbl">${o.label}</div><div class="sub">${o.sub}</div></div>`).join('');
+</script></body></html>

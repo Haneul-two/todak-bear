@@ -1,0 +1,44 @@
+# 🐻 토닥곰 프로필 카드 자동 갱신
+# <username>/<username> 레포의 .github/workflows/ 에 넣으면 매일 곰이 다시 그려짐.
+name: Todak Bear Profile
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # 매일 00:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  draw-bear:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+
+      # 이번 주(최근 7일) 본인 커밋 수 집계
+      - name: Count weekly commits
+        id: count
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SINCE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          N=$(gh api -X GET search/commits \
+                -H "Accept: application/vnd.github.cloak-preview+json" \
+                -f q="author:${{ github.actor }} committer-date:>$SINCE" \
+                --jq '.total_count' || echo 0)
+          echo "commits=$N" >> "$GITHUB_OUTPUT"
+
+      - name: Draw Todak card
+        run: node apps/github-profile/generate.js --commits "${{ steps.count.outputs.commits }}" --out assets/todak-card.svg
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "todak-bot"
+          git config user.email "todak-bot@users.noreply.github.com"
+          git add assets/todak-card.svg
+          git diff --staged --quiet || git commit -m "🐻 update Todak card"
+          git push
