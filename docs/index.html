@@ -160,7 +160,7 @@
     </nav>
 
     <img class="hero-bear" src="assets/poses/greeting.png" alt="Todak waving" />
-    <h1><span data-t="brand">토닥곰</span> <span style="font-weight:500;color:var(--ink-soft)">Todak</span></h1>
+    <h1><span data-t="brand">토닥곰</span> <span data-t="rom" style="font-weight:500;color:var(--ink-soft)">Todak</span></h1>
     <p class="tagline" data-t="tagline">혼내지 않고 토닥이는 곰</p>
     <div class="speech" data-t="speech">“괜찮아, 막힐 수도 있지. 같이 해보자. 🐾”</div>
     <div class="cta">
@@ -319,7 +319,7 @@ node apps/desktop/build-dist.js
   // ── 정적 텍스트 사전 ──
   const STR = {
     ko: {
-      brand:'토닥곰', nav_surfaces:'표면', nav_moods:'기분', nav_why:'왜 다른가', nav_install:'설치',
+      brand:'토닥곰', rom:'Todak', nav_surfaces:'표면', nav_moods:'기분', nav_why:'왜 다른가', nav_install:'설치',
       tagline:'혼내지 않고 토닥이는 곰', speech:'“괜찮아, 막힐 수도 있지. 같이 해보자. 🐾”',
       cta_install:'⬇ 설치하기', cta_browse:'기분 둘러보기',
       platform:'Windows 10/11 · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)',
@@ -354,7 +354,7 @@ node apps/desktop/build-dist.js
       try1_code:'<span class="c"># 모든 기분 한 번에</span>\nnode packages/bear-core/demo.js\n\n<span class="c"># 데스크톱 UI를 브라우저로 (Rust 불필요)</span>\nnode apps/desktop/build-dist.js\n<span class="c"># → apps/desktop/dist/index.html 을 브라우저로 열기</span>',
     },
     en: {
-      brand:'Todak', nav_surfaces:'Surfaces', nav_moods:'Moods', nav_why:'Why', nav_install:'Install',
+      brand:'Todak', rom:'', nav_surfaces:'Surfaces', nav_moods:'Moods', nav_why:'Why', nav_install:'Install',
       tagline:'The bear that comforts, never scolds', speech:'“It’s okay to get stuck. Let’s try together. 🐾”',
       cta_install:'⬇ Install', cta_browse:'Browse moods',
       platform:'Windows 10/11 · lightweight Tauri desktop pet · open source (MIT)',
