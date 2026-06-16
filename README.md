@@ -27,7 +27,7 @@ apps/terminal          apps/github-profile     apps/desktop
 
 - **소개 페이지:** https://haneul-two.github.io/todak-bear/ (한국어/English)
 - **Windows 설치 파일:** [최신 릴리즈 다운로드](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.2.0_x64-setup.exe) (약 8&nbsp;MB) — 실행 시 SmartScreen 경고가 뜨면 `추가 정보 → 실행`(아직 코드서명 전 단계)
-- **macOS 설치 파일:** [최신 릴리즈](https://github.com/Haneul-two/todak-bear/releases/latest)에서 칩에 맞는 `.dmg`를 받으세요 — Apple Silicon(M1~)은 `_aarch64.dmg`, Intel은 `_x64.dmg`. 미서명이라 첫 실행만 `우클릭 → 열기`로 엽니다. (맥/윈도우 설치 파일은 [`release-desktop` 워크플로](.github/workflows/release.yml)가 `v*` 태그 푸시 시 자동 빌드)
+- **macOS 설치 파일:** [최신 릴리즈](https://github.com/Haneul-two/todak-bear/releases/latest)에서 칩에 맞는 `.dmg`를 받으세요 — Apple Silicon(M1~)은 `_aarch64.dmg`, Intel은 `_x64.dmg`. 미서명이라 `.dmg`에서 `todak-bear`를 `응용 프로그램`으로 드래그한 뒤, 터미널에서 `xattr -dr com.apple.quarantine /Applications/todak-bear.app`을 한 번 실행하면 열립니다(“`todak-bear`은(는) 손상되었기 때문에…” 경고는 앱 문제가 아니라 macOS 격리 표시 때문이에요. Apple 공증 전 단계). (맥/윈도우 설치 파일은 [`release-desktop` 워크플로](.github/workflows/release.yml)가 `v*` 태그 푸시 시 자동 빌드)
 - **무결성 검증:** 설치 파일마다 같은 이름의 `.sha256` 파일이 릴리즈에 함께 올라갑니다. 다운로드 후 Windows는 `Get-FileHash …setup.exe -Algorithm SHA256`, macOS는 `shasum -a 256 …dmg` 결과가 `.sha256` 내용과 같은지 확인하세요.
 
 ## 기분 사전 (위로 톤)
