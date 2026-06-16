@@ -51,6 +51,7 @@ jobs:
         run: npm install
 
       - name: 빌드 & 릴리즈 (Tauri)
+        id: build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,3 +67,21 @@ jobs:
           releaseDraft: true # 초안으로 만들어 두고, 확인 후 직접 Publish (안전)
           prerelease: false
           args: ${{ matrix.args }}
+
+      # 설치 파일(.exe/.dmg)마다 같은 이름의 .sha256 사이드카를 만들어 릴리즈에 업로드
+      # → 문서의 무결성 검증이 버전에 묶이지 않고 매 릴리즈 자동 유지됨
+      - name: SHA-256 체크섬 생성·업로드
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '${{ steps.build.outputs.artifactPaths }}' | jq -r '.[]' | while read -r f; do
+            case "$f" in
+              *-setup.exe|*.dmg)
+                sha=$(sha256sum "$f" | awk '{print $1}')
+                printf '%s  %s\n' "$sha" "$(basename "$f")" > "$f.sha256"
+                gh release upload "${{ github.ref_name }}" "$f.sha256" --clobber --repo "${{ github.repository }}"
+                ;;
+            esac
+          done

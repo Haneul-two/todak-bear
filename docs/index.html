@@ -249,7 +249,7 @@
         <li><strong data-t="dl1_t">설치 파일 받기</strong>
           <span data-t="dl1_d">운영체제에 맞는 최신 설치 파일을 받으세요. Windows는 <code class="inline">todak-bear_x64-setup.exe</code>(약 8&nbsp;MB), macOS는 <code class="inline">.dmg</code>(Apple Silicon / Intel)입니다.</span>
           <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
-            <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe" data-t="dl_btn">⬇ Windows 설치 파일</a>
+            <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.2.0_x64-setup.exe" data-t="dl_btn">⬇ Windows 설치 파일</a>
             <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest" data-t="dl_btn_mac">⬇ macOS (.dmg)</a>
             <a class="btn btn-ghost" href="https://github.com/Haneul-two/todak-bear/releases" data-t="dl_btn2">모든 릴리즈 보기</a>
           </div>
@@ -260,7 +260,7 @@
         <li><strong data-t="dl3_t">곰 만나기</strong>
           <span data-t="dl3_d">바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.</span></li>
       </ol>
-      <div class="note" data-t="dl_note">ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.</div>
+      <div class="note" data-t="dl_note">ⓘ <strong>무결성 검증(SHA-256):</strong> 설치 파일마다 같은 이름의 <code class="inline">.sha256</code> 파일이 릴리즈에 함께 올라갑니다. 다운로드 후 Windows는 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code>, macOS는 <code class="inline">shasum -a 256 …dmg</code> 결과가 <code class="inline">.sha256</code> 내용과 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.</div>
     </div>
 
     <div class="panel" data-panel="source">
@@ -346,7 +346,7 @@ node apps/desktop/build-dist.js
       dl_mac_pick:'🍎 macOS는 칩에 맞는 파일을 고르세요 — Apple Silicon(M1~)은 <code class="inline">_aarch64.dmg</code>, Intel은 <code class="inline">_x64.dmg</code>.',
       dl2_t:'실행', dl2_d:'Windows는 설치 파일 실행 후 SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요. macOS는 <code class="inline">.dmg</code>를 열어 토닥곰을 <code class="inline">응용 프로그램</code>으로 끌어 넣은 뒤, 미서명이라 첫 실행만 <code class="inline">우클릭 → 열기</code>로 열면 됩니다(모두 서명 전 단계라 정상입니다).',
       dl3_t:'곰 만나기', dl3_d:'바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.',
-      dl_note:'ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.',
+      dl_note:'ⓘ <strong>무결성 검증(SHA-256):</strong> 설치 파일마다 같은 이름의 <code class="inline">.sha256</code> 파일이 릴리즈에 함께 올라갑니다. 다운로드 후 Windows는 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code>, macOS는 <code class="inline">shasum -a 256 …dmg</code> 결과가 <code class="inline">.sha256</code> 내용과 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.',
       src1_t:'준비물 설치', src1_d:'<a href="https://nodejs.org">Node.js</a>와 <a href="https://rustup.rs">Rust</a>(rustup)를 설치합니다. Windows는 빌드 도구(MSVC)도 필요해요.',
       src2_t:'레포 클론 & 의존성', src3_t:'빌드 & 실행',
       src_note:'ⓘ 데스크톱 앱(<code class="inline">apps/desktop</code>)이 메인 표면이에요. 터미널 곰·GitHub 카드도 같은 레포에서 <code class="inline">node</code> 한 줄로 바로 체험할 수 있습니다.',
@@ -382,7 +382,7 @@ node apps/desktop/build-dist.js
       dl_mac_pick:'🍎 On macOS pick the file for your chip — Apple Silicon (M1+) uses <code class="inline">_aarch64.dmg</code>, Intel uses <code class="inline">_x64.dmg</code>.',
       dl2_t:'Run it', dl2_d:'On Windows, run the installer; if SmartScreen warns you, click <code class="inline">More info → Run anyway</code>. On macOS, open the <code class="inline">.dmg</code>, drag Todak into <code class="inline">Applications</code>, then — since it isn’t signed — open it the first time via <code class="inline">right-click → Open</code> (all expected; not code-signed yet).',
       dl3_t:'Meet the bear', dl3_d:'Todak appears at the bottom-right of your desktop. Left-click = cycle expressions, right-click = menu (toggle walking · reset position · quit), and you can drag it anywhere.',
-      dl_note:'ⓘ <strong>Verify integrity (SHA-256):</strong> after downloading, run <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> in PowerShell and check it matches <code class="inline">344ac433…7d876a02</code> from the <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">checksum file</a>. Still wary of the binary? Build it yourself from the <strong>Build from source</strong> tab.',
+      dl_note:'ⓘ <strong>Verify integrity (SHA-256):</strong> every installer ships with a matching <code class="inline">.sha256</code> file in the release. After downloading, check that <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> (Windows) or <code class="inline">shasum -a 256 …dmg</code> (macOS) matches the <code class="inline">.sha256</code> contents. Still wary of the binary? Build it yourself from the <strong>Build from source</strong> tab.',
       src1_t:'Install prerequisites', src1_d:'Install <a href="https://nodejs.org">Node.js</a> and <a href="https://rustup.rs">Rust</a> (rustup). On Windows you’ll also need the MSVC build tools.',
       src2_t:'Clone & install deps', src3_t:'Build & run',
       src_note:'ⓘ The desktop app (<code class="inline">apps/desktop</code>) is the main surface. The terminal bear and GitHub card also run from the same repo with a single <code class="inline">node</code> command.',
