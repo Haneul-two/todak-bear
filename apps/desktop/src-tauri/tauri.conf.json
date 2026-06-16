@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.todak.bear",
   "build": {
+    "beforeBuildCommand": "node build-dist.js",
     "frontendDist": "../dist"
   },
   "app": {

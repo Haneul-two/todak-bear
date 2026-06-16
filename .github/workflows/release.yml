@@ -1,0 +1,68 @@
+# 🐻 토닥곰 데스크톱 — 맥(.dmg)·윈도우(.exe) 설치 파일 자동 빌드 & 릴리즈
+# 트리거: v로 시작하는 태그 푸시(예: v0.2.0) 또는 수동 실행(Actions 탭 → Run workflow)
+name: release-desktop
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write # 릴리즈 생성·에셋 업로드 권한
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest # 맥 (Apple Silicon, M1~)
+            args: "--bundles app,dmg --target aarch64-apple-darwin"
+            rust-targets: aarch64-apple-darwin
+          - platform: macos-latest # 맥 (Intel)
+            args: "--bundles app,dmg --target x86_64-apple-darwin"
+            rust-targets: x86_64-apple-darwin
+          - platform: windows-latest # 윈도우 (기존과 동일하게 NSIS .exe)
+            args: ""
+            rust-targets: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: 소스 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Rust 설치
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Rust 캐시
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./apps/desktop/src-tauri -> target
+
+      - name: 프런트엔드 의존성 설치 (@tauri-apps/cli)
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: 빌드 & 릴리즈 (Tauri)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          # 태그 푸시면 그 태그로, 수동 실행이면 v + 실행번호로 묶어 한 릴리즈에 모음
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || format('v0-ci-{0}', github.run_number) }}
+          releaseName: "🐻 토닥곰 ${{ github.ref_type == 'tag' && github.ref_name || format('CI #{0}', github.run_number) }}"
+          releaseBody: |
+            맥(.dmg)·윈도우(.exe) 설치 파일입니다. 🐾
+            - 윈도우: `*_x64-setup.exe` (SmartScreen 경고 시 `추가 정보 → 실행`, 아직 코드서명 전)
+            - 맥: `*_aarch64.dmg`(Apple Silicon) / `*_x64.dmg`(Intel) — 미서명이라 첫 실행 시 `우클릭 → 열기`
+          releaseDraft: true # 초안으로 만들어 두고, 확인 후 직접 Publish (안전)
+          prerelease: false
+          args: ${{ matrix.args }}
