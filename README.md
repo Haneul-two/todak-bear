@@ -27,7 +27,8 @@ apps/terminal          apps/github-profile     apps/desktop
 
 - **소개 페이지:** https://haneul-two.github.io/todak-bear/ (한국어/English)
 - **Windows 설치 파일:** [최신 릴리즈 다운로드](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe) (약 8&nbsp;MB) — 실행 시 SmartScreen 경고가 뜨면 `추가 정보 → 실행`(아직 코드서명 전 단계)
-- **무결성 검증:** 다운로드 후 `Get-FileHash todak-bear_0.1.0_x64-setup.exe -Algorithm SHA256` 결과가 릴리즈의 [`.sha256` 체크섬](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256)과 같은지 확인하세요 (`344ac433…7d876a02`).
+- **macOS 설치 파일:** [최신 릴리즈](https://github.com/Haneul-two/todak-bear/releases/latest)에서 칩에 맞는 `.dmg`를 받으세요 — Apple Silicon(M1~)은 `_aarch64.dmg`, Intel은 `_x64.dmg`. 미서명이라 첫 실행만 `우클릭 → 열기`로 엽니다. (맥/윈도우 설치 파일은 [`release-desktop` 워크플로](.github/workflows/release.yml)가 `v*` 태그 푸시 시 자동 빌드)
+- **무결성 검증:** 다운로드 후 `Get-FileHash todak-bear_0.1.0_x64-setup.exe -Algorithm SHA256` 결과가 릴리즈의 [`.sha256` 체크섬](https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256)과 같은지 확인하세요 (`344ac433…7d876a02`). macOS는 `shasum -a 256 *.dmg`로 확인할 수 있어요.
 
 ## 기분 사전 (위로 톤)
 
@@ -74,7 +75,7 @@ node apps/desktop/build-dist.js
 | bear-core | ✅ 완성·검증 (8기분 렌더 확인) |
 | #2 터미널 | ✅ 완성·검증 (성공/실패/영어 확인) |
 | #3 GitHub | ✅ 완성·검증 (카드 3종 + Action 워크플로) |
-| #1 데스크톱 | ✅ **v0.1.0 출시** — Tauri 빌드·NSIS 설치 파일 [Release](https://github.com/Haneul-two/todak-bear/releases) 게시 |
+| #1 데스크톱 | ✅ **v0.1.0 출시** — Tauri 빌드·NSIS(.exe) 설치 파일 [Release](https://github.com/Haneul-two/todak-bear/releases) 게시 · 맥(.dmg)/윈도우 멀티 OS 자동 빌드 CI 추가 |
 | 🌐 랜딩 | ✅ [GitHub Pages 라이브](https://haneul-two.github.io/todak-bear/) (KO/EN) |
 
 ## License

@@ -167,7 +167,7 @@
       <a class="btn btn-primary" href="#install" data-t="cta_install">⬇ 설치하기</a>
       <a class="btn btn-ghost" href="#moods" data-t="cta_browse">기분 둘러보기</a>
     </div>
-    <p class="platform-note" data-t="platform">Windows 10/11 · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)</p>
+    <p class="platform-note" data-t="platform">Windows 10/11 · macOS(Apple Silicon·Intel) · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)</p>
   </div>
 </header>
 
@@ -239,7 +239,7 @@
     </div>
 
     <div class="install-tabs">
-      <div class="tab active" data-tab="download" data-t="tab_dl">⬇ 다운로드 (Windows)</div>
+      <div class="tab active" data-tab="download" data-t="tab_dl">⬇ 다운로드 (Windows · macOS)</div>
       <div class="tab" data-tab="source" data-t="tab_src">🛠 소스에서 빌드</div>
       <div class="tab" data-tab="try" data-t="tab_try">👀 브라우저로 먼저 보기</div>
     </div>
@@ -247,14 +247,16 @@
     <div class="panel active" data-panel="download">
       <ol class="steps">
         <li><strong data-t="dl1_t">설치 파일 받기</strong>
-          <span data-t="dl1_d">아래 버튼으로 최신 Windows 설치 파일(<code class="inline">todak-bear_x64-setup.exe</code>, 약 8&nbsp;MB)을 내려받으세요.</span>
+          <span data-t="dl1_d">운영체제에 맞는 최신 설치 파일을 받으세요. Windows는 <code class="inline">todak-bear_x64-setup.exe</code>(약 8&nbsp;MB), macOS는 <code class="inline">.dmg</code>(Apple Silicon / Intel)입니다.</span>
           <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
             <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe" data-t="dl_btn">⬇ Windows 설치 파일</a>
+            <a class="btn btn-primary" href="https://github.com/Haneul-two/todak-bear/releases/latest" data-t="dl_btn_mac">⬇ macOS (.dmg)</a>
             <a class="btn btn-ghost" href="https://github.com/Haneul-two/todak-bear/releases" data-t="dl_btn2">모든 릴리즈 보기</a>
           </div>
+          <p style="margin:10px 0 0; font-size:.86rem; color:var(--ink-soft)" data-t="dl_mac_pick">🍎 macOS는 칩에 맞는 파일을 고르세요 — Apple Silicon(M1~)은 <code class="inline">_aarch64.dmg</code>, Intel은 <code class="inline">_x64.dmg</code>.</p>
         </li>
         <li><strong data-t="dl2_t">실행</strong>
-          <span data-t="dl2_d">내려받은 설치 파일을 실행합니다. Windows SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요(서명 전 단계라 정상입니다).</span></li>
+          <span data-t="dl2_d">Windows는 설치 파일 실행 후 SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요. macOS는 <code class="inline">.dmg</code>를 열어 토닥곰을 <code class="inline">응용 프로그램</code>으로 끌어 넣은 뒤, 미서명이라 첫 실행만 <code class="inline">우클릭 → 열기</code>로 열면 됩니다(모두 서명 전 단계라 정상입니다).</span></li>
         <li><strong data-t="dl3_t">곰 만나기</strong>
           <span data-t="dl3_d">바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.</span></li>
       </ol>
@@ -322,7 +324,7 @@ node apps/desktop/build-dist.js
       brand:'토닥곰', rom:'Todak', nav_surfaces:'표면', nav_moods:'기분', nav_why:'왜 다른가', nav_install:'설치',
       tagline:'혼내지 않고 토닥이는 곰', speech:'“괜찮아, 막힐 수도 있지. 같이 해보자. 🐾”',
       cta_install:'⬇ 설치하기', cta_browse:'기분 둘러보기',
-      platform:'Windows 10/11 · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)',
+      platform:'Windows 10/11 · macOS(Apple Silicon·Intel) · Tauri 기반 가벼운 데스크톱 펫 · 오픈소스(MIT)',
       surf_title:'한 마리 곰, 네 개의 표면',
       surf_desc:'코어 하나에 곰의 표정·기분·대사가 들어 있고, 터미널·GitHub·바탕화면이 같은 곰을 그대로 가져갑니다. 어디서 만나도 같은 캐릭터예요.',
       s1_t:'바탕화면 펫', s1_d:'화면을 떠다니며 산책하고, 클릭하면 표정을 바꿔요. 작업 신호를 읽어 기분으로 반응합니다.', s1_tag:'Tauri · 메인 표면',
@@ -338,10 +340,11 @@ node apps/desktop/build-dist.js
       good_t:'🤗 토닥곰',
       good_list:'<li>에러 나면 → <strong>안아줌</strong></li><li>오래 막히면 → <strong>토닥토닥</strong></li><li>새벽이면 → <strong>이제 자도 괜찮아</strong></li><li>해내면 → <strong>정말 잘했어!</strong></li>',
       inst_title:'토닥곰 데려오기', inst_desc:'바로 받아 실행하거나, 소스에서 직접 빌드할 수 있어요.',
-      tab_dl:'⬇ 다운로드 (Windows)', tab_src:'🛠 소스에서 빌드', tab_try:'👀 브라우저로 먼저 보기',
-      dl1_t:'설치 파일 받기', dl1_d:'아래 버튼으로 최신 Windows 설치 파일(<code class="inline">todak-bear_x64-setup.exe</code>, 약 8&nbsp;MB)을 내려받으세요.',
-      dl_btn:'⬇ Windows 설치 파일', dl_btn2:'모든 릴리즈 보기',
-      dl2_t:'실행', dl2_d:'내려받은 설치 파일을 실행합니다. Windows SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요(서명 전 단계라 정상입니다).',
+      tab_dl:'⬇ 다운로드 (Windows · macOS)', tab_src:'🛠 소스에서 빌드', tab_try:'👀 브라우저로 먼저 보기',
+      dl1_t:'설치 파일 받기', dl1_d:'운영체제에 맞는 최신 설치 파일을 받으세요. Windows는 <code class="inline">todak-bear_x64-setup.exe</code>(약 8&nbsp;MB), macOS는 <code class="inline">.dmg</code>(Apple Silicon / Intel)입니다.',
+      dl_btn:'⬇ Windows 설치 파일', dl_btn_mac:'⬇ macOS (.dmg)', dl_btn2:'모든 릴리즈 보기',
+      dl_mac_pick:'🍎 macOS는 칩에 맞는 파일을 고르세요 — Apple Silicon(M1~)은 <code class="inline">_aarch64.dmg</code>, Intel은 <code class="inline">_x64.dmg</code>.',
+      dl2_t:'실행', dl2_d:'Windows는 설치 파일 실행 후 SmartScreen 경고가 뜨면 <code class="inline">추가 정보 → 실행</code>을 눌러주세요. macOS는 <code class="inline">.dmg</code>를 열어 토닥곰을 <code class="inline">응용 프로그램</code>으로 끌어 넣은 뒤, 미서명이라 첫 실행만 <code class="inline">우클릭 → 열기</code>로 열면 됩니다(모두 서명 전 단계라 정상입니다).',
       dl3_t:'곰 만나기', dl3_d:'바탕화면 오른쪽 아래에 토닥곰이 나타나요. 좌클릭=표정 구경, 우클릭=메뉴(산책 끄기·위치 초기화·종료), 잡고 끌어 옮길 수 있어요.',
       dl_note:'ⓘ <strong>무결성 검증(SHA-256):</strong> 다운로드 후 PowerShell에서 <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> 결과가 <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">체크섬 파일</a>의 <code class="inline">344ac433…7d876a02</code> 와 같은지 확인하세요. 바이너리가 꺼림칙하면 <strong>소스에서 빌드</strong> 탭으로 직접 빌드해도 됩니다.',
       src1_t:'준비물 설치', src1_d:'<a href="https://nodejs.org">Node.js</a>와 <a href="https://rustup.rs">Rust</a>(rustup)를 설치합니다. Windows는 빌드 도구(MSVC)도 필요해요.',
@@ -357,7 +360,7 @@ node apps/desktop/build-dist.js
       brand:'Todak', rom:'', nav_surfaces:'Surfaces', nav_moods:'Moods', nav_why:'Why', nav_install:'Install',
       tagline:'The bear that comforts, never scolds', speech:'“It’s okay to get stuck. Let’s try together. 🐾”',
       cta_install:'⬇ Install', cta_browse:'Browse moods',
-      platform:'Windows 10/11 · lightweight Tauri desktop pet · open source (MIT)',
+      platform:'Windows 10/11 · macOS (Apple Silicon · Intel) · lightweight Tauri desktop pet · open source (MIT)',
       surf_title:'One bear, four surfaces',
       surf_desc:'A single core holds the bear’s faces, moods, and lines — the terminal, GitHub, and desktop all pull the very same bear. Same character wherever you meet it.',
       s1_t:'Desktop pet', s1_d:'Floats around, takes little walks, and changes expression on click. Reads your work signals and reacts with moods.', s1_tag:'Tauri · main surface',
@@ -373,10 +376,11 @@ node apps/desktop/build-dist.js
       good_t:'🤗 Todak',
       good_list:'<li>On error → <strong>gives a hug</strong></li><li>Stuck a while → <strong>pat, pat</strong></li><li>Late at night → <strong>it’s okay to rest</strong></li><li>You made it → <strong>well done!</strong></li>',
       inst_title:'Bring Todak home', inst_desc:'Grab it and run, or build it straight from source.',
-      tab_dl:'⬇ Download (Windows)', tab_src:'🛠 Build from source', tab_try:'👀 Preview in browser',
-      dl1_t:'Get the installer', dl1_d:'Use the button below to download the latest Windows installer (<code class="inline">todak-bear_x64-setup.exe</code>, ~8&nbsp;MB).',
-      dl_btn:'⬇ Windows installer', dl_btn2:'All releases',
-      dl2_t:'Run it', dl2_d:'Run the downloaded installer. If Windows SmartScreen warns you, click <code class="inline">More info → Run anyway</code> (expected — it isn’t code-signed yet).',
+      tab_dl:'⬇ Download (Windows · macOS)', tab_src:'🛠 Build from source', tab_try:'👀 Preview in browser',
+      dl1_t:'Get the installer', dl1_d:'Grab the latest build for your OS. Windows is <code class="inline">todak-bear_x64-setup.exe</code> (~8&nbsp;MB); macOS is a <code class="inline">.dmg</code> (Apple Silicon / Intel).',
+      dl_btn:'⬇ Windows installer', dl_btn_mac:'⬇ macOS (.dmg)', dl_btn2:'All releases',
+      dl_mac_pick:'🍎 On macOS pick the file for your chip — Apple Silicon (M1+) uses <code class="inline">_aarch64.dmg</code>, Intel uses <code class="inline">_x64.dmg</code>.',
+      dl2_t:'Run it', dl2_d:'On Windows, run the installer; if SmartScreen warns you, click <code class="inline">More info → Run anyway</code>. On macOS, open the <code class="inline">.dmg</code>, drag Todak into <code class="inline">Applications</code>, then — since it isn’t signed — open it the first time via <code class="inline">right-click → Open</code> (all expected; not code-signed yet).',
       dl3_t:'Meet the bear', dl3_d:'Todak appears at the bottom-right of your desktop. Left-click = cycle expressions, right-click = menu (toggle walking · reset position · quit), and you can drag it anywhere.',
       dl_note:'ⓘ <strong>Verify integrity (SHA-256):</strong> after downloading, run <code class="inline">Get-FileHash …setup.exe -Algorithm SHA256</code> in PowerShell and check it matches <code class="inline">344ac433…7d876a02</code> from the <a href="https://github.com/Haneul-two/todak-bear/releases/latest/download/todak-bear_0.1.0_x64-setup.exe.sha256">checksum file</a>. Still wary of the binary? Build it yourself from the <strong>Build from source</strong> tab.',
       src1_t:'Install prerequisites', src1_d:'Install <a href="https://nodejs.org">Node.js</a> and <a href="https://rustup.rs">Rust</a> (rustup). On Windows you’ll also need the MSVC build tools.',
