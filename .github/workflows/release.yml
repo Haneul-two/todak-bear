@@ -77,6 +77,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo '${{ steps.build.outputs.artifactPaths }}' | jq -r '.[]' | while read -r f; do
+            f="${f//\\//}" # 윈도우 백슬래시 경로 → 슬래시 (Git Bash 호환)
             case "$f" in
               *-setup.exe|*.dmg)
                 sha=$(sha256sum "$f" | awk '{print $1}')
