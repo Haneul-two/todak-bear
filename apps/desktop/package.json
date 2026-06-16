@@ -4,6 +4,7 @@
   "private": true,
   "description": "🐻 토닥곰 데스크톱 펫 (Tauri)",
   "scripts": {
+    "tauri": "tauri",
     "dev": "tauri dev",
     "build": "tauri build"
   },
