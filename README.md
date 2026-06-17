@@ -68,6 +68,28 @@ node apps/desktop/build-dist.js
 #   3) 설치 파일 만들기: npm run build → src-tauri/target/release/bundle/nsis/
 ```
 
+## 🛠 업무 런처 (데스크톱)
+
+데스크톱 곰을 **우클릭 → "🛠 도구"** 에서 로컬 도구(예: Streamlit 웹앱)를 실행·중지할 수 있습니다. 곰이 서버를 띄우고 브라우저를 열어 주며, 포트 도달 여부로 켜짐(●)/꺼짐(○)을 표시합니다.
+
+도구 목록은 코드가 아니라 **각자 PC의 `~/.todak/tools.json`** 에서 읽습니다(없으면 빈 목록으로 자동 생성 — 개인 정보는 빌드에 포함되지 않음). 도구 추가는 이 파일에 객체를 한 개 넣으면 끝:
+
+```jsonc
+[
+  {
+    "id": "my-app",                 // 고유 식별자
+    "label": "내 앱",                // 메뉴 표시 이름
+    "cwd": "C:\\path\\to\\my-app",  // 작업 디렉터리
+    "command": "streamlit",          // 실행 명령
+    "args": ["run", "app.py", "--server.port", "8600", "--server.headless", "true"],
+    "port": 8600,                    // 상태 판정용 포트
+    "url": "http://localhost:8600/"  // 실행 후 열 주소
+  }
+]
+```
+
+> 중지하면 서버를 실제로 종료합니다. 이때 열려 있던 탭은 "Connection error"(Streamlit 기본 동작)를 보일 수 있으니 그 탭은 닫으면 됩니다.
+
 ## 상태
 
 | 표면 | 상태 |

@@ -57,6 +57,14 @@
   #ctxmenu .mi:hover { background: #F1E9DC; }
   #ctxmenu .mi.danger { color: #C0563C; }
   #ctxmenu .sep { height: 1px; background: #ECE3D6; margin: 4px 6px; }
+  #ctxmenu .mi.tools-head { color:#B7ABA0; font-size:11px; padding:4px 12px 2px; cursor:default; }
+  #ctxmenu .mi.tools-head:hover { background:transparent; }
+  #ctxmenu .mi.tools-empty { color:#B7ABA0; font-size:11px; padding:3px 12px 5px; cursor:default; white-space:normal; max-width:200px; }
+  #ctxmenu .mi.tools-empty:hover { background:transparent; }
+  #ctxmenu .tool .dot { display:inline-block; width:8px; height:8px; border-radius:50%;
+    margin-right:8px; background:#D8CBB8; vertical-align:middle; }
+  #ctxmenu .tool.on .dot { background:#7BAE7F; }
+  #ctxmenu .tool .port { color:#B7ABA0; font-size:11px; margin-left:6px; }
 </style>
 </head>
 <body>
@@ -73,6 +81,9 @@
     <div class="mi" data-act="pat">🐾 토닥 받기</div>
     <div class="mi" data-act="cycle">😀 표정 구경하기</div>
     <div class="mi" data-act="wander" id="mi-wander">🚶 산책 끄기</div>
+    <div class="sep"></div>
+    <div class="mi tools-head">🛠 도구</div>
+    <div id="tools-list"></div>
     <div class="sep"></div>
     <div class="mi" data-act="reset">📍 위치 초기화</div>
     <div class="mi" data-act="hide">🙈 잠깐 숨기기</div>
@@ -246,6 +257,59 @@
       setInterval(() => applyState({ ...demo[di++ % demo.length] }), 5000);
     }
 
+    // ── 업무 런처(도구 실행/중지) ──
+    // 메뉴를 열 때마다 도구 목록 + 포트 상태를 백엔드에서 받아 그린다.
+    async function renderTools() {
+      const list = document.getElementById('tools-list');
+      if (!list || !tau || !tau.core || !tau.core.invoke) return;
+      let toolList = [], status = {};
+      try {
+        toolList = await tau.core.invoke('list_tools');
+        status = await tau.core.invoke('tool_status');
+      } catch (_) { return; }
+      list.innerHTML = '';
+      if (!toolList.length) {
+        const empty = document.createElement('div');
+        empty.className = 'mi tools-empty';
+        empty.textContent = LANG === 'en'
+          ? 'No tools yet — add them in ~/.todak/tools.json'
+          : '등록된 도구 없음 — ~/.todak/tools.json에 추가';
+        list.appendChild(empty);
+        return;
+      }
+      for (const t of toolList) {
+        const on = !!status[t.id];
+        const el = document.createElement('div');
+        el.className = 'mi tool' + (on ? ' on' : '');
+        el.dataset.tool = t.id;
+        el.dataset.on = on ? '1' : '0';
+        el.innerHTML = '<span class="dot"></span>' + t.label +
+          (on ? '<span class="port">:' + t.port + '</span>' : '');
+        list.appendChild(el);
+      }
+    }
+
+    async function handleTool(id, on) {
+      if (!tau || !tau.core || !tau.core.invoke) return;
+      try {
+        if (on) {
+          await tau.core.invoke('stop_tool', { id });
+          say(LANG === 'en'
+            ? 'Closed it — you can close that browser tab now. 🐾'
+            : '닫았어 — 그 브라우저 탭은 닫아도 돼. 🐾');
+        } else {
+          setMood('cheerful', { speak: false });
+          say(LANG === 'en' ? 'Opening it for you! 🐾' : '열어줄게! 🐾');
+          await tau.core.invoke('launch_tool', { id });
+        }
+      } catch (_) {
+        setMood('hug', { speak: false });
+        say(LANG === 'en'
+          ? "Hmm, that didn't work. Let's check together. 🤗"
+          : '앗, 잘 안 됐어. 같이 확인해보자 🤗');
+      }
+    }
+
     // ── 우클릭 메뉴 ──
     const ctx = document.getElementById('ctxmenu');
     const hideMenu = () => ctx.classList.remove('show');
@@ -253,8 +317,9 @@
     function sendAction(cmd) {
       if (tau && tau.core && tau.core.invoke) tau.core.invoke(cmd);
     }
-    document.addEventListener('contextmenu', (e) => {
+    document.addEventListener('contextmenu', async (e) => {
       e.preventDefault();
+      await renderTools();
       ctx.classList.add('show'); // 크기 측정 위해 먼저 표시
       const mw = ctx.offsetWidth, mh = ctx.offsetHeight;
       const x = Math.max(4, Math.min(e.clientX, window.innerWidth - mw - 4));
@@ -263,8 +328,15 @@
       ctx.style.top = y + 'px';
     });
     ctx.addEventListener('click', (e) => {
+      const tool = e.target.closest('.tool');
+      if (tool) {
+        e.stopPropagation();
+        hideMenu();
+        handleTool(tool.dataset.tool, tool.dataset.on === '1');
+        return;
+      }
       const mi = e.target.closest('.mi');
-      if (!mi) return;
+      if (!mi || mi.classList.contains('tools-head') || mi.classList.contains('tools-empty')) return;
       e.stopPropagation();
       hideMenu();
       const act = mi.dataset.act;

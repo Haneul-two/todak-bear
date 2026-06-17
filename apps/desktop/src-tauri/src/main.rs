@@ -4,11 +4,19 @@
 // 곰의 기분 판단(deriveSignals/pickMood)은 프런트(JS 코어)가 담당 → 로직 한 곳에만 존재.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod tools;
+
+use std::collections::HashMap;
+use std::net::{SocketAddr, TcpStream};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, WindowEvent};
+use tools::{build_command, parse_tools, Tool, ToolView, SEED_TOOLS_JSON};
+
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 
 fn state_path() -> PathBuf {
     // 신호원(state.js)과 동일 위치: $TODAK_HOME 우선, 없으면 홈/.todak
@@ -30,6 +38,41 @@ fn window_state_path() -> PathBuf {
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".into());
     PathBuf::from(home).join(".todak").join("window.json")
+}
+
+// tools.json 경로 — state_path()/window_state_path()와 동일한 TODAK_HOME 규칙.
+fn tools_path() -> PathBuf {
+    if let Ok(dir) = std::env::var("TODAK_HOME") {
+        return PathBuf::from(dir).join("tools.json");
+    }
+    let home = std::env::var("USERPROFILE")
+        .or_else(|_| std::env::var("HOME"))
+        .unwrap_or_else(|_| ".".into());
+    PathBuf::from(home).join(".todak").join("tools.json")
+}
+
+// 파일이 있으면 파싱, 없으면 시드를 써 두고 시드를 반환. 깨진 파일은 빈 목록.
+fn load_tools_from(path: &std::path::Path) -> Vec<Tool> {
+    match std::fs::read_to_string(path) {
+        Ok(s) => parse_tools(&s).unwrap_or_default(),
+        Err(_) => {
+            if let Some(dir) = path.parent() {
+                let _ = std::fs::create_dir_all(dir);
+            }
+            let _ = std::fs::write(path, SEED_TOOLS_JSON);
+            parse_tools(SEED_TOOLS_JSON).unwrap_or_default()
+        }
+    }
+}
+
+fn load_tools() -> Vec<Tool> {
+    load_tools_from(&tools_path())
+}
+
+// 해당 포트(127.0.0.1)에 짧은 타임아웃으로 연결되면 '켜짐'으로 본다.
+fn is_port_open(port: u16) -> bool {
+    let addr: SocketAddr = ([127, 0, 0, 1], port).into();
+    TcpStream::connect_timeout(&addr, Duration::from_millis(300)).is_ok()
 }
 
 fn save_window_pos(x: i32, y: i32) {
@@ -118,10 +161,13 @@ fn wander_loop(win: tauri::WebviewWindow, wandering: Arc<AtomicBool>, home: Arc<
 struct AppState {
     home: Arc<Mutex<(i32, i32)>>,
     wander_enabled: Arc<AtomicBool>,
+    // 곰이 띄운 도구 프로세스(중지용). key = tool id.
+    running: Mutex<HashMap<String, std::process::Child>>,
 }
 
 #[tauri::command]
-fn quit(app: tauri::AppHandle) {
+fn quit(app: tauri::AppHandle, state: tauri::State<AppState>) {
+    kill_all(&state);
     app.exit(0);
 }
 
@@ -150,6 +196,75 @@ fn toggle_wander(app: tauri::AppHandle, state: tauri::State<AppState>) {
     let _ = app.emit("todak://wander", serde_json::json!({ "enabled": on }));
 }
 
+#[tauri::command]
+fn list_tools() -> Vec<ToolView> {
+    load_tools().iter().map(|t| t.to_view()).collect()
+}
+
+#[tauri::command]
+fn tool_status() -> HashMap<String, bool> {
+    load_tools()
+        .iter()
+        .map(|t| (t.id.clone(), is_port_open(t.port)))
+        .collect()
+}
+
+// CREATE_NO_WINDOW — streamlit 콘솔 창이 뜨지 않게.
+#[cfg(windows)]
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+#[tauri::command]
+fn launch_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> {
+    let tool = load_tools()
+        .into_iter()
+        .find(|t| t.id == id)
+        .ok_or_else(|| format!("도구를 찾을 수 없어: {id}"))?;
+    let spec = build_command(&tool);
+
+    let mut cmd = std::process::Command::new(&spec.program);
+    cmd.args(&spec.args).current_dir(&spec.cwd);
+    #[cfg(windows)]
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    let child = cmd
+        .spawn()
+        .map_err(|e| format!("{} 실행 실패: {e}", spec.program))?;
+    state.running.lock().unwrap().insert(id, child);
+
+    // 서버 기동을 기다리지 않고 바로 브라우저를 연다(탭이 잠깐 로딩될 수 있음).
+    let _ = std::process::Command::new("cmd")
+        .args(["/C", "start", "", &tool.url])
+        .spawn();
+    Ok(())
+}
+
+#[tauri::command]
+fn stop_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> {
+    let mut map = state.running.lock().unwrap();
+    match map.remove(&id) {
+        Some(mut child) => {
+            // streamlit 런처는 python 자식을 띄우므로 프로세스 트리째 종료.
+            let _ = std::process::Command::new("taskkill")
+                .args(["/F", "/T", "/PID", &child.id().to_string()])
+                .output();
+            let _ = child.wait();
+            Ok(())
+        }
+        None => Err("내가 띄운 게 아니라 끌 수 없어".into()),
+    }
+}
+
+// 곰이 띄운 모든 도구 프로세스를 트리째 종료.
+fn kill_all(state: &tauri::State<AppState>) {
+    let mut map = state.running.lock().unwrap();
+    for child in map.values_mut() {
+        let _ = std::process::Command::new("taskkill")
+            .args(["/F", "/T", "/PID", &child.id().to_string()])
+            .output();
+    }
+    map.clear();
+}
+
 // 창 흔들기(휘두르기) 감지용 상태
 struct Shake {
     last_pos: Option<(i32, i32)>,
@@ -171,11 +286,24 @@ fn main() {
 
     let wandering_ev = wandering.clone();
     let home_ev = home.clone();
-    let app_state = AppState { home: home.clone(), wander_enabled: wander_enabled.clone() };
+    let app_state = AppState {
+        home: home.clone(),
+        wander_enabled: wander_enabled.clone(),
+        running: Mutex::new(HashMap::new()),
+    };
 
     tauri::Builder::default()
         .manage(app_state)
-        .invoke_handler(tauri::generate_handler![quit, hide_window, reset_pos, toggle_wander])
+        .invoke_handler(tauri::generate_handler![
+            quit,
+            hide_window,
+            reset_pos,
+            toggle_wander,
+            list_tools,
+            tool_status,
+            launch_tool,
+            stop_tool
+        ])
         // 창을 잡고 격하게 휘두르면(빠른 이동 누적) 어지러움 신호 emit
         .on_window_event(move |window, event| {
             if let WindowEvent::Moved(pos) = event {
@@ -241,4 +369,34 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running 토닥곰");
+}
+
+#[cfg(test)]
+mod launcher_tests {
+    use super::*;
+
+    #[test]
+    fn load_tools_seeds_when_file_missing() {
+        let mut dir = std::env::temp_dir();
+        dir.push(format!("todak_launcher_test_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let path = dir.join("tools.json");
+
+        let tools = load_tools_from(&path);
+
+        assert!(tools.is_empty(), "빈 시드이므로 도구가 없어야 함");
+        assert!(path.exists(), "tools.json 파일이 디스크에 생성돼야 함");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn detects_open_then_closed_port() {
+        use std::net::TcpListener;
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        assert!(is_port_open(port), "리스닝 중인 포트는 열림으로 판정");
+        drop(listener);
+        assert!(!is_port_open(port), "닫힌 포트는 닫힘으로 판정");
+    }
 }
