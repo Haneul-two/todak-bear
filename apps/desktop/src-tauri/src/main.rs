@@ -17,6 +17,8 @@ use tools::{build_command, parse_tools, Tool, ToolView, SEED_TOOLS_JSON};
 
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
+#[cfg(unix)]
+use std::os::unix::process::CommandExt as _;
 
 fn state_path() -> PathBuf {
     // 신호원(state.js)과 동일 위치: $TODAK_HOME 우선, 없으면 홈/.todak
@@ -209,9 +211,41 @@ fn tool_status() -> HashMap<String, bool> {
         .collect()
 }
 
-// CREATE_NO_WINDOW — streamlit 콘솔 창이 뜨지 않게.
+// CREATE_NO_WINDOW — streamlit 콘솔 창이 뜨지 않게(Windows).
 #[cfg(windows)]
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+// 기본 브라우저로 URL 열기(OS별).
+fn open_browser(url: &str) {
+    #[cfg(windows)]
+    let _ = std::process::Command::new("cmd")
+        .args(["/C", "start", "", url])
+        .spawn();
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("open").arg(url).spawn();
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let _ = std::process::Command::new("xdg-open").arg(url).spawn();
+}
+
+// 자식 프로세스를 트리(그룹)째 종료(OS별). streamlit이 하위 프로세스를 띄우므로.
+fn kill_tree(child: &mut std::process::Child) {
+    #[cfg(windows)]
+    {
+        // streamlit.exe 런처가 python.exe를 띄우므로 /T로 트리째.
+        let _ = std::process::Command::new("taskkill")
+            .args(["/F", "/T", "/PID", &child.id().to_string()])
+            .output();
+    }
+    #[cfg(unix)]
+    {
+        // launch 시 자기 프로세스 그룹 리더로 띄웠으므로(-pid = 그룹 전체) 그룹째 종료.
+        let pid = child.id();
+        let _ = std::process::Command::new("kill")
+            .args(["-TERM", &format!("-{pid}")])
+            .output();
+    }
+    let _ = child.wait();
+}
 
 #[tauri::command]
 fn launch_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> {
@@ -225,6 +259,8 @@ fn launch_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> 
     cmd.args(&spec.args).current_dir(&spec.cwd);
     #[cfg(windows)]
     cmd.creation_flags(CREATE_NO_WINDOW);
+    #[cfg(unix)]
+    cmd.process_group(0); // 자기 그룹 리더 → 중지 시 그룹째 종료 가능
 
     let child = cmd
         .spawn()
@@ -232,9 +268,7 @@ fn launch_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> 
     state.running.lock().unwrap().insert(id, child);
 
     // 서버 기동을 기다리지 않고 바로 브라우저를 연다(탭이 잠깐 로딩될 수 있음).
-    let _ = std::process::Command::new("cmd")
-        .args(["/C", "start", "", &tool.url])
-        .spawn();
+    open_browser(&tool.url);
     Ok(())
 }
 
@@ -243,11 +277,7 @@ fn stop_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> {
     let mut map = state.running.lock().unwrap();
     match map.remove(&id) {
         Some(mut child) => {
-            // streamlit 런처는 python 자식을 띄우므로 프로세스 트리째 종료.
-            let _ = std::process::Command::new("taskkill")
-                .args(["/F", "/T", "/PID", &child.id().to_string()])
-                .output();
-            let _ = child.wait();
+            kill_tree(&mut child);
             Ok(())
         }
         None => Err("내가 띄운 게 아니라 끌 수 없어".into()),
@@ -258,9 +288,7 @@ fn stop_tool(id: String, state: tauri::State<AppState>) -> Result<(), String> {
 fn kill_all(state: &tauri::State<AppState>) {
     let mut map = state.running.lock().unwrap();
     for child in map.values_mut() {
-        let _ = std::process::Command::new("taskkill")
-            .args(["/F", "/T", "/PID", &child.id().to_string()])
-            .output();
+        kill_tree(child);
     }
     map.clear();
 }
