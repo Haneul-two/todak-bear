@@ -49,7 +49,6 @@
     const C = window.HoneyCatch;
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
-    const wrap = document.getElementById('wrap');
 
     // DPR 대응: 백킹 스토어 = 논리크기 × DPR, 좌표는 논리크기로 통일
     function fitCanvas() {
@@ -70,7 +69,7 @@
     const renderer = window.HoneyRenderer.createRenderer(C, 'assets/poses/');
 
     let state = C.createState({ best: loadBest(), seed: (Date.now() & 0xffff) + 1 });
-    let started = false, running = true, last = 0;
+    let started = false, running = true, last = 0, rafId;
 
     const startOverlay = document.getElementById('startOverlay');
     const overOverlay = document.getElementById('overOverlay');
@@ -90,14 +89,14 @@
         }
       }
       renderer.draw(ctx, state);
-      requestAnimationFrame(frame);
+      rafId = requestAnimationFrame(frame);
     }
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
 
-    // 탭 전환 시 일시정지(dt 폭주 방지)
+    // 탭 전환 시 일시정지(dt 폭주 방지) — rafId 취소로 중복 루프 방지
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { running = false; }
-      else { running = true; last = 0; requestAnimationFrame(frame); }
+      if (document.hidden) { running = false; cancelAnimationFrame(rafId); }
+      else { running = true; last = 0; rafId = requestAnimationFrame(frame); }
     });
 
     document.getElementById('startBtn').addEventListener('click', () => {
