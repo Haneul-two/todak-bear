@@ -61,15 +61,45 @@ function tick(state, intent, dt) {
     state.items.push({ x, y: -ITEM_H, vy: fallSpeed(state.elapsed), type: isStar ? 'star' : 'honey' });
   }
 
-  // 3) 낙하
-  for (const it of state.items) it.y += it.vy * dt;
+  // 3) 낙하 + 받기/놓침
+  const kept = [];
+  for (const it of state.items) {
+    it.y += it.vy * dt;
+    if (caught(state, it)) {
+      state.score += it.type === 'star' ? 5 : 1;
+      state.flash = 0.25;
+      continue;                          // 받음 → 제거
+    }
+    if (it.y - ITEM_H / 2 > state.h) {   // 바닥 통과 → 놓침
+      state.lives -= 1;
+      if (state.lives <= 0) { state.lives = 0; state.over = true; }
+      continue;
+    }
+    kept.push(it);
+  }
+  state.items = kept;
+  if (state.over && state.score > state.best) state.best = state.score;
 
   return state;
 }
 
-function caught() { return false; }     // Task 4에서 구현
-function reset(state) { return state; } // Task 7 직전 보강
-function poseFor(state) { return state.over ? 'hug' : 'content'; } // Task 4에서 cheer 추가
+function caught(state, it) {
+  const bx = state.bearX - BEAR_W / 2, by = BEAR_Y - BEAR_H / 2;
+  const ix = it.x - ITEM_W / 2, iy = it.y - ITEM_H / 2;
+  return bx < ix + ITEM_W && bx + BEAR_W > ix && by < iy + ITEM_H && by + BEAR_H > iy;
+}
+
+function poseFor(state) {
+  if (state.over) return 'hug';
+  if (state.flash > 0) return 'cheer';
+  return 'content';
+}
+
+function reset(state) {
+  const best = state.best;
+  Object.assign(state, createState({ best, seed: (Date.now() & 0xffff) + 1 }));
+  return state;
+}
 
 const api = {
   WIDTH, HEIGHT, BEAR_W, BEAR_H, BEAR_Y, BEAR_SPEED, ITEM_W, ITEM_H, START_LIVES,

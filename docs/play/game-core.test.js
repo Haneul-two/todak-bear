@@ -48,3 +48,63 @@ test('난이도: 시간이 지날수록 생성 간격이 짧아진다', () => {
 test('난이도: 시간이 지날수록 낙하가 빨라진다', () => {
   assert.ok(C.fallSpeed(40) > C.fallSpeed(0));
 });
+
+test('caught: 곰과 겹친 아이템은 true', () => {
+  const s = C.createState();
+  const it = { x: s.bearX, y: C.BEAR_Y, vy: 0, type: 'honey' };
+  assert.strictEqual(C.caught(s, it), true);
+});
+
+test('caught: 멀리 있는 아이템은 false', () => {
+  const s = C.createState();
+  const it = { x: s.bearX, y: 0, vy: 0, type: 'honey' };
+  assert.strictEqual(C.caught(s, it), false);
+});
+
+test('받기: 꿀 +1, 별 +5', () => {
+  const s = C.createState();
+  s.items = [{ x: s.bearX, y: C.BEAR_Y, vy: 0, type: 'honey' }];
+  s.spawnTimer = 99; // 이 틱엔 새 생성 막기
+  C.tick(s, null, 0.001);
+  assert.strictEqual(s.score, 1);
+
+  const s2 = C.createState();
+  s2.items = [{ x: s2.bearX, y: C.BEAR_Y, vy: 0, type: 'star' }];
+  s2.spawnTimer = 99;
+  C.tick(s2, null, 0.001);
+  assert.strictEqual(s2.score, 5);
+});
+
+test('놓침: 바닥 통과하면 라이프 감소, 0이면 게임오버', () => {
+  const s = C.createState();
+  s.spawnTimer = 99;
+  s.items = [{ x: 10, y: s.h + 100, vy: 0, type: 'honey' }];
+  C.tick(s, null, 0.001);
+  assert.strictEqual(s.lives, C.START_LIVES - 1);
+
+  const s2 = C.createState();
+  s2.lives = 1; s2.spawnTimer = 99;
+  s2.items = [{ x: 10, y: s2.h + 100, vy: 0, type: 'honey' }];
+  C.tick(s2, null, 0.001);
+  assert.strictEqual(s2.lives, 0);
+  assert.strictEqual(s2.over, true);
+});
+
+test('poseFor: 받은 직후 cheer, 게임오버 hug, 평소 content', () => {
+  const s = C.createState();
+  assert.strictEqual(C.poseFor(s), 'content');
+  s.flash = 0.2;
+  assert.strictEqual(C.poseFor(s), 'cheer');
+  s.over = true;
+  assert.strictEqual(C.poseFor(s), 'hug');
+});
+
+test('reset: best는 유지하고 새 게임', () => {
+  const s = C.createState();
+  s.score = 30; s.best = 30; s.over = true; s.lives = 0;
+  C.reset(s);
+  assert.strictEqual(s.best, 30);
+  assert.strictEqual(s.score, 0);
+  assert.strictEqual(s.lives, C.START_LIVES);
+  assert.strictEqual(s.over, false);
+});
