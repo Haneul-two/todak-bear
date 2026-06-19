@@ -51,7 +51,7 @@ function createRenderer(core, posesBasePath) {
     ctx.textAlign = 'right';
     ctx.fillText('최고 ' + state.best, w - 12, 12);
     ctx.textAlign = 'center';
-    const hearts = '♥'.repeat(state.lives) + '♡'.repeat(core.START_LIVES - state.lives);
+    const hearts = '♥'.repeat(state.lives) + '♡'.repeat(Math.max(0, core.START_LIVES - state.lives));
     ctx.fillText(hearts, w / 2, 12);
   }
 

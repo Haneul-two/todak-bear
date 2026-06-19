@@ -36,8 +36,9 @@ function attach(input, el) {
   el.addEventListener('touchstart', onTouch, { passive: false });
   el.addEventListener('touchmove', onTouch, { passive: false });
   el.addEventListener('touchend', (e) => {
+    e.preventDefault();
     if (e.touches.length === 0) { input.setLeft(false); input.setRight(false); }
-  });
+  }, { passive: false });
 }
 
 const api = { createInput, attach };
