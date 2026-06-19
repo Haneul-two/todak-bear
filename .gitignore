@@ -8,3 +8,4 @@ apps/desktop/dist/
 _*.png
 *.tmp
 *.log
+docs/play/node_modules/
