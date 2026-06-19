@@ -41,6 +41,6 @@ function attach(input, el) {
   }, { passive: false });
 }
 
-const api = { createInput, attach };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.HoneyInput = api;
+const inputApi = { createInput, attach };
+if (typeof module !== 'undefined' && module.exports) module.exports = inputApi;
+if (typeof window !== 'undefined') window.HoneyInput = inputApi;

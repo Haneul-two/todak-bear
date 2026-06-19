@@ -58,6 +58,6 @@ function createRenderer(core, posesBasePath) {
   return { draw };
 }
 
-const api = { createRenderer };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.HoneyRenderer = api;
+const rendererApi = { createRenderer };
+if (typeof module !== 'undefined' && module.exports) module.exports = rendererApi;
+if (typeof window !== 'undefined') window.HoneyRenderer = rendererApi;

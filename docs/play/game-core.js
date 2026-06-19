@@ -101,10 +101,10 @@ function reset(state) {
   return state;
 }
 
-const api = {
+const gameCoreApi = {
   WIDTH, HEIGHT, BEAR_W, BEAR_H, BEAR_Y, BEAR_SPEED, ITEM_W, ITEM_H, START_LIVES,
   makeRng, createState, tick, caught, reset, poseFor,
   spawnInterval, fallSpeed,
 };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.HoneyCatch = api;
+if (typeof module !== 'undefined' && module.exports) module.exports = gameCoreApi;
+if (typeof window !== 'undefined') window.HoneyCatch = gameCoreApi;
