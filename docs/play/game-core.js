@@ -34,12 +34,36 @@ function createState(opts = {}) {
   };
 }
 
+function spawnInterval(elapsed) {            // 1.1s → 최소 0.45s
+  return Math.max(0.45, 1.1 - elapsed * 0.012);
+}
+function fallSpeed(elapsed) {                // 120 → 최대 300 px/s
+  return Math.min(300, 120 + elapsed * 3);
+}
+
 function tick(state, intent, dt) {
   if (state.over) return state;
+  state.elapsed += dt;
+  if (state.flash > 0) state.flash = Math.max(0, state.flash - dt);
+
+  // 1) 곰 이동
   if (intent === 'left')  state.bearX -= BEAR_SPEED * dt;
   if (intent === 'right') state.bearX += BEAR_SPEED * dt;
   const half = BEAR_W / 2;
   state.bearX = Math.max(half, Math.min(state.w - half, state.bearX));
+
+  // 2) 생성
+  state.spawnTimer -= dt;
+  if (state.spawnTimer <= 0) {
+    state.spawnTimer = spawnInterval(state.elapsed);
+    const isStar = state.rng() < 0.15;
+    const x = ITEM_W / 2 + state.rng() * (state.w - ITEM_W);
+    state.items.push({ x, y: -ITEM_H, vy: fallSpeed(state.elapsed), type: isStar ? 'star' : 'honey' });
+  }
+
+  // 3) 낙하
+  for (const it of state.items) it.y += it.vy * dt;
+
   return state;
 }
 
@@ -50,6 +74,7 @@ function poseFor(state) { return state.over ? 'hug' : 'content'; } // Task 4에�
 const api = {
   WIDTH, HEIGHT, BEAR_W, BEAR_H, BEAR_Y, BEAR_SPEED, ITEM_W, ITEM_H, START_LIVES,
   makeRng, createState, tick, caught, reset, poseFor,
+  spawnInterval, fallSpeed,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 if (typeof window !== 'undefined') window.HoneyCatch = api;
