@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>🐻 토닥곰 키우기</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #2b2622; color: #f3e9d8;
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    display: flex; align-items: center; justify-content: center; overscroll-behavior: none; }
+  #wrap { position: relative; width: min(92vw, 360px); aspect-ratio: 3 / 4; touch-action: none; }
+  canvas { width: 100%; height: 100%; border-radius: 16px; display: block;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  #toast { position: absolute; left: 50%; top: 18%; transform: translateX(-50%);
+    background: rgba(255,255,255,.95); color: #5a4a36; font-weight: 700;
+    padding: 10px 18px; border-radius: 999px; font-size: 15px; opacity: 0;
+    transition: opacity .4s; pointer-events: none; white-space: nowrap; }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game"></canvas>
+    <div id="toast"></div>
+  </div>
+
+  <script src="assets/todak.js"></script>
+  <script src="tama-core.js"></script>
+  <script src="tama-input.js"></script>
+  <script src="tama-renderer.js"></script>
+  <script>
+    const C = window.TodakTama;
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const toastEl = document.getElementById('toast');
+
+    function fitCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 3);
+      canvas.width = C.WIDTH * dpr;
+      canvas.height = C.HEIGHT * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    fitCanvas();
+    window.addEventListener('resize', fitCanvas);
+
+    const SAVE_KEY = 'todak.tama.v1';
+    function load() {
+      try { const raw = localStorage.getItem(SAVE_KEY); return raw ? C.deserialize(raw) : null; }
+      catch (e) { return null; }
+    }
+    function save(state) {
+      try { state.lastSeen = Date.now(); localStorage.setItem(SAVE_KEY, C.serialize(state)); }
+      catch (e) { /* 시크릿 모드 등 무시 */ }
+    }
+
+    // 상태 복원 + 오프라인 경과 반영
+    let state = load() || C.createState({ bornAt: Date.now() });
+    C.applyElapsed(state, Date.now() - state.lastSeen);
+
+    const input = window.TodakTamaInput.createInput();
+    window.TodakTamaInput.attach(input, canvas, C);
+    const renderer = window.TodakTamaRenderer.createRenderer(C, 'assets/poses/');
+
+    let lastStage = C.growthStage(state, Date.now());
+    let last = 0, running = true, rafId, hiddenAt = 0, saveAcc = 0;
+
+    const STAGE_KO = { baby: '아기곰', child: '소년곰', adult: '어른곰', elder: '노년곰' };
+    function toast(msg) {
+      toastEl.textContent = msg; toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2200);
+    }
+
+    function frame(ts) {
+      if (!running) return;
+      const now = Date.now();
+      const dt = Math.min(0.05, last ? (ts - last) / 1000 : 0);
+      last = ts;
+
+      const intent = input.read();
+      if (intent) C.care(state, intent);
+      C.tick(state, dt);
+
+      const stage = C.growthStage(state, now);
+      if (stage !== lastStage) { lastStage = stage; toast(`⭐ ${STAGE_KO[stage]}이 되었어요!`); }
+
+      renderer.draw(ctx, state, now);
+
+      saveAcc += dt;
+      if (saveAcc > 2) { saveAcc = 0; save(state); }
+      rafId = requestAnimationFrame(frame);
+    }
+    rafId = requestAnimationFrame(frame);
+
+    // 탭 전환: 일시정지 + 복귀 시 경과시간 일괄 반영
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        running = false; cancelAnimationFrame(rafId); hiddenAt = Date.now(); save(state);
+      } else {
+        C.applyElapsed(state, Date.now() - hiddenAt);
+        running = true; last = 0; rafId = requestAnimationFrame(frame);
+      }
+    });
+    window.addEventListener('pagehide', () => save(state));
+  </script>
+</body>
+</html>
