@@ -133,3 +133,29 @@ test('bubbleFor: 최소 욕구 이모지 / 돌봄직후 하트 / 평온 null', (
   s.flash = 1.0;
   assert.strictEqual(C.bubbleFor(s), '❤️');
 });
+
+test('serialize→deserialize 라운드트립', () => {
+  const s = C.createState({ name: '꿀곰', bornAt: 5000 });
+  s.lastSeen = 9000; s.stats.hunger = 33; s.flash = 1.2; s.cooldown.feed = 0.5;
+  const back = C.deserialize(C.serialize(s));
+  assert.strictEqual(back.name, '꿀곰');
+  assert.strictEqual(back.bornAt, 5000);
+  assert.strictEqual(back.lastSeen, 9000);
+  assert.strictEqual(back.stats.hunger, 33);
+  assert.strictEqual(back.flash, 0);        // transient 초기화
+  assert.strictEqual(back.cooldown.feed, 0);
+});
+
+test('deserialize: 깨진 입력은 null', () => {
+  assert.strictEqual(C.deserialize('not json'), null);
+  assert.strictEqual(C.deserialize('{}'), null);
+  assert.strictEqual(C.deserialize(JSON.stringify({ v: 2, bornAt: 1, stats: {} })), null);
+});
+
+test('deserialize: 범위 벗어난 스탯은 80으로 보정', () => {
+  const back = C.deserialize(JSON.stringify({ v: 1, name: 'x', bornAt: 0, lastSeen: 0, stats: { hunger: 999, fun: 'bad', heart: 50, energy: -3 } }));
+  assert.strictEqual(back.stats.hunger, 80);
+  assert.strictEqual(back.stats.fun, 80);
+  assert.strictEqual(back.stats.heart, 50);
+  assert.strictEqual(back.stats.energy, 80);
+});

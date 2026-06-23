@@ -79,10 +79,29 @@ function bubbleFor(state) {
   return best ? BUBBLE_EMOJI[best] : null;
 }
 
+function serialize(state) {
+  return JSON.stringify({ v: 1, name: state.name, bornAt: state.bornAt, lastSeen: state.lastSeen, stats: state.stats });
+}
+
+function deserialize(str) {
+  try {
+    const o = JSON.parse(str);
+    if (!o || o.v !== 1 || typeof o.bornAt !== 'number' || !o.stats) return null;
+    const s = createState({ name: o.name, bornAt: o.bornAt });
+    s.lastSeen = typeof o.lastSeen === 'number' ? o.lastSeen : o.bornAt;
+    for (const k of STAT_KEYS) {
+      const v = o.stats[k];
+      s.stats[k] = (typeof v === 'number' && v >= 0 && v <= MAX) ? v : 80;
+    }
+    return s;
+  } catch (e) { return null; }
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
   clamp, createState, care, tick, applyElapsed, growthStage, poseFor, BUBBLE_EMOJI, bubbleFor,
+  serialize, deserialize,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;
