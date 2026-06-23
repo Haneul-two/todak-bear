@@ -95,3 +95,17 @@ test('applyElapsed: 아주 오래면 0 수렴, 음수 무변화', () => {
   C.applyElapsed(s2, -5);
   assert.strictEqual(s2.stats.hunger, 80);
 });
+
+test('growthStage: 경계 1·3·7일', () => {
+  const born = 1000000;
+  const s = C.createState({ bornAt: born });
+  const at = (days) => C.growthStage(s, born + days * C.DAY_MS);
+  assert.strictEqual(at(0), 'baby');
+  assert.strictEqual(at(0.99), 'baby');
+  assert.strictEqual(at(1), 'child');
+  assert.strictEqual(at(2.9), 'child');
+  assert.strictEqual(at(3), 'adult');
+  assert.strictEqual(at(6.9), 'adult');
+  assert.strictEqual(at(7), 'elder');
+  assert.strictEqual(at(30), 'elder');
+});

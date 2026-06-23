@@ -52,10 +52,18 @@ function applyElapsed(state, ms) {
   return state;
 }
 
+function growthStage(state, nowMs) {
+  const days = (nowMs - state.bornAt) / DAY_MS;
+  if (days < STAGE_DAYS.child) return 'baby';
+  if (days < STAGE_DAYS.adult) return 'child';
+  if (days < STAGE_DAYS.elder) return 'adult';
+  return 'elder';
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
-  clamp, createState, care, tick, applyElapsed,
+  clamp, createState, care, tick, applyElapsed, growthStage,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;
