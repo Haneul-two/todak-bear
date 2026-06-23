@@ -56,3 +56,27 @@ test('care: 알 수 없는 타입은 false', () => {
   const s = C.createState();
   assert.strictEqual(C.care(s, 'dance'), false);
 });
+
+test('tick: 1시간이면 각 스탯 -6', () => {
+  const s = C.createState();           // 모두 80
+  C.tick(s, 3600);                     // 1시간
+  for (const k of C.STAT_KEYS) assert.ok(Math.abs(s.stats[k] - 74) < 1e-6, k);
+});
+
+test('tick: 0 하한 클램프', () => {
+  const s = C.createState();
+  s.stats.hunger = 2;
+  C.tick(s, 3600);                     // -6 시도
+  assert.strictEqual(s.stats.hunger, 0);
+});
+
+test('tick: flash·쿨다운이 dt만큼 줄어 0에서 멈춘다', () => {
+  const s = C.createState();
+  s.flash = 1.0; s.cooldown.feed = 1.0;
+  C.tick(s, 0.4);
+  assert.ok(Math.abs(s.flash - 0.6) < 1e-6);
+  assert.ok(Math.abs(s.cooldown.feed - 0.6) < 1e-6);
+  C.tick(s, 5);
+  assert.strictEqual(s.flash, 0);
+  assert.strictEqual(s.cooldown.feed, 0);
+});

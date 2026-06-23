@@ -37,10 +37,18 @@ function care(state, type) {
   return true;
 }
 
+function tick(state, dt) {
+  const dec = DECAY_PER_HOUR * (dt / 3600);
+  for (const k of STAT_KEYS) state.stats[k] = clamp(state.stats[k] - dec, 0, MAX);
+  if (state.flash > 0) state.flash = Math.max(0, state.flash - dt);
+  for (const t of ACTION_KEYS) if (state.cooldown[t] > 0) state.cooldown[t] = Math.max(0, state.cooldown[t] - dt);
+  return state;
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
-  clamp, createState, care,
+  clamp, createState, care, tick,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;
