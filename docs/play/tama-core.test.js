@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const C = require('./tama-core.js');
+const I = require('./tama-input.js');
 
 test('createState 기본값', () => {
   const s = C.createState({ bornAt: 1000 });
@@ -158,4 +159,29 @@ test('deserialize: 범위 벗어난 스탯은 80으로 보정', () => {
   assert.strictEqual(back.stats.fun, 80);
   assert.strictEqual(back.stats.heart, 50);
   assert.strictEqual(back.stats.energy, 80);
+});
+
+test('BUTTONS·STATS 상수 형태', () => {
+  assert.strictEqual(C.BUTTONS.length, 4);
+  assert.deepStrictEqual(C.BUTTONS.map(b => b.type), ['feed', 'play', 'pat', 'sleep']);
+  for (const b of C.BUTTONS) {
+    assert.ok(b.x >= 0 && b.x + b.w <= C.WIDTH, 'x 범위');
+    assert.ok(b.y >= 0 && b.y + b.h <= C.HEIGHT, 'y 범위');
+  }
+  assert.deepStrictEqual(C.STATS.map(s => s.key), ['hunger', 'fun', 'heart', 'energy']);
+});
+
+test('hitTest: 버튼 안/밖', () => {
+  const feed = C.BUTTONS[0];
+  const cx = feed.x + feed.w / 2, cy = feed.y + feed.h / 2;
+  assert.strictEqual(I.hitTest(C.BUTTONS, cx, cy), 'feed');
+  assert.strictEqual(I.hitTest(C.BUTTONS, 5, 5), null); // 상단 빈 영역
+});
+
+test('createInput: push 후 read 1회 소비', () => {
+  const inp = I.createInput();
+  assert.strictEqual(inp.read(), null);
+  inp.push('play');
+  assert.strictEqual(inp.read(), 'play');
+  assert.strictEqual(inp.read(), null);
 });

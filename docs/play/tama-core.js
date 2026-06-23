@@ -13,6 +13,21 @@ const ACTIONS = { feed: 'hunger', play: 'fun', pat: 'heart', sleep: 'energy' };
 const STAT_KEYS = ['hunger', 'fun', 'heart', 'energy'];
 const ACTION_KEYS = ['feed', 'play', 'pat', 'sleep'];
 
+// 하단 2×2 돌봄 버튼 (논리좌표)
+const BUTTONS = [
+  { type: 'feed',  label: '밥주기',   emoji: '🍯', x: 12,  y: 372, w: 163, h: 43 },
+  { type: 'play',  label: '놀아주기', emoji: '⚽', x: 185, y: 372, w: 163, h: 43 },
+  { type: 'pat',   label: '토닥이기', emoji: '💗', x: 12,  y: 425, w: 163, h: 43 },
+  { type: 'sleep', label: '재우기',   emoji: '😴', x: 185, y: 425, w: 163, h: 43 },
+];
+// 상단 스탯바 메타
+const STATS = [
+  { key: 'hunger', label: '배부름', emoji: '🍯', color: '#E8A33D' },
+  { key: 'fun',    label: '즐거움', emoji: '⚽', color: '#6FB36F' },
+  { key: 'heart',  label: '마음',   emoji: '💗', color: '#D98AAE' },
+  { key: 'energy', label: '기력',   emoji: '😴', color: '#6FA8C7' },
+];
+
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
 function createState(opts = {}) {
@@ -100,6 +115,7 @@ function deserialize(str) {
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
+  BUTTONS, STATS,
   clamp, createState, care, tick, applyElapsed, growthStage, poseFor, BUBBLE_EMOJI, bubbleFor,
   serialize, deserialize,
 };
