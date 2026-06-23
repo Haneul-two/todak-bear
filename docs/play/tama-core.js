@@ -45,10 +45,17 @@ function tick(state, dt) {
   return state;
 }
 
+function applyElapsed(state, ms) {
+  if (!(ms > 0)) return state;
+  const dec = DECAY_PER_HOUR * (ms / 3600000);
+  for (const k of STAT_KEYS) state.stats[k] = clamp(state.stats[k] - dec, 0, MAX);
+  return state;
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
-  clamp, createState, care, tick,
+  clamp, createState, care, tick, applyElapsed,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;

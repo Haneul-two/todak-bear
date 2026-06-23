@@ -80,3 +80,18 @@ test('tick: flash·쿨다운이 dt만큼 줄어 0에서 멈춘다', () => {
   assert.strictEqual(s.flash, 0);
   assert.strictEqual(s.cooldown.feed, 0);
 });
+
+test('applyElapsed: 6시간이면 -36', () => {
+  const s = C.createState();           // 80
+  C.applyElapsed(s, 6 * 3600 * 1000);
+  for (const k of C.STAT_KEYS) assert.ok(Math.abs(s.stats[k] - 44) < 1e-6, k);
+});
+
+test('applyElapsed: 아주 오래면 0 수렴, 음수 무변화', () => {
+  const s = C.createState();
+  C.applyElapsed(s, 1000 * 3600 * 1000); // 1000시간
+  for (const k of C.STAT_KEYS) assert.strictEqual(s.stats[k], 0);
+  const s2 = C.createState();
+  C.applyElapsed(s2, -5);
+  assert.strictEqual(s2.stats.hunger, 80);
+});
