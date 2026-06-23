@@ -60,10 +60,29 @@ function growthStage(state, nowMs) {
   return 'elder';
 }
 
+function poseFor(state) {
+  if (state.flash > 0) return 'happy';
+  const { hunger, fun, heart, energy } = state.stats;
+  if (energy < SLEEP_BAND) return 'sleep';
+  if (Math.min(hunger, fun, heart, energy) < NEED_BAND) return 'sad';
+  if ((hunger + fun + heart + energy) / 4 >= HAPPY_AVG) return 'happy';
+  return 'content';
+}
+
+const BUBBLE_EMOJI = { hunger: '🍯', fun: '⚽', heart: '💗', energy: '😴' };
+function bubbleFor(state) {
+  if (state.flash > 0) return '❤️';
+  let best = null;
+  for (const k of STAT_KEYS) {
+    if (state.stats[k] < NEED_BAND && (best === null || state.stats[k] < state.stats[best])) best = k;
+  }
+  return best ? BUBBLE_EMOJI[best] : null;
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
-  clamp, createState, care, tick, applyElapsed, growthStage,
+  clamp, createState, care, tick, applyElapsed, growthStage, poseFor, BUBBLE_EMOJI, bubbleFor,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;

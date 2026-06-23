@@ -109,3 +109,27 @@ test('growthStage: 경계 1·3·7일', () => {
   assert.strictEqual(at(7), 'elder');
   assert.strictEqual(at(30), 'elder');
 });
+
+test('poseFor: 우선순위 happy>sleep>sad>content', () => {
+  const s = C.createState();
+  assert.strictEqual(C.poseFor(s), 'content');          // 80 평균
+  s.stats = { hunger: 90, fun: 90, heart: 90, energy: 90 };
+  assert.strictEqual(C.poseFor(s), 'happy');            // 평균>=85
+  s.stats = { hunger: 20, fun: 80, heart: 80, energy: 80 };
+  assert.strictEqual(C.poseFor(s), 'sad');              // 하나<30
+  s.stats = { hunger: 80, fun: 80, heart: 80, energy: 10 };
+  assert.strictEqual(C.poseFor(s), 'sleep');            // 기력<25
+  s.flash = 1.0;
+  assert.strictEqual(C.poseFor(s), 'happy');            // flash 최우선
+});
+
+test('bubbleFor: 최소 욕구 이모지 / 돌봄직후 하트 / 평온 null', () => {
+  const s = C.createState();
+  assert.strictEqual(C.bubbleFor(s), null);
+  s.stats.hunger = 12;
+  assert.strictEqual(C.bubbleFor(s), '🍯');
+  s.stats.energy = 5;                                   // 더 낮음
+  assert.strictEqual(C.bubbleFor(s), '😴');
+  s.flash = 1.0;
+  assert.strictEqual(C.bubbleFor(s), '❤️');
+});
