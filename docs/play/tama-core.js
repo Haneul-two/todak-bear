@@ -27,10 +27,20 @@ function createState(opts = {}) {
   };
 }
 
+function care(state, type) {
+  const key = ACTIONS[type];
+  if (!key) return false;
+  if (state.cooldown[type] > 0) return false;
+  state.stats[key] = clamp(state.stats[key] + CARE_AMOUNT, 0, MAX);
+  state.flash = FLASH;
+  state.cooldown[type] = COOLDOWN;
+  return true;
+}
+
 const tamaCoreApi = {
   WIDTH, HEIGHT, MAX, DECAY_PER_HOUR, CARE_AMOUNT, COOLDOWN, FLASH,
   SLEEP_BAND, NEED_BAND, HAPPY_AVG, DAY_MS, STAGE_DAYS, ACTIONS, STAT_KEYS, ACTION_KEYS,
-  clamp, createState,
+  clamp, createState, care,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = tamaCoreApi;
 if (typeof window !== 'undefined') window.TodakTama = tamaCoreApi;
