@@ -24,7 +24,6 @@
     <div id="toast"></div>
   </div>
 
-  <script src="assets/todak.js"></script>
   <script src="tama-core.js"></script>
   <script src="tama-input.js"></script>
   <script src="tama-renderer.js"></script>
@@ -96,7 +95,7 @@
       if (document.hidden) {
         running = false; cancelAnimationFrame(rafId); hiddenAt = Date.now(); save(state);
       } else {
-        C.applyElapsed(state, Date.now() - hiddenAt);
+        if (hiddenAt) C.applyElapsed(state, Date.now() - hiddenAt);
         running = true; last = 0; rafId = requestAnimationFrame(frame);
       }
     });
