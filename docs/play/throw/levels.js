@@ -51,6 +51,6 @@ function validateLevel(lv) {
   return true;
 }
 
-const api = { LEVELS, OBSTACLE_TYPES, getLevel, validateLevel };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.TodakThrowLevels = api;
+const levelsApi = { LEVELS, OBSTACLE_TYPES, getLevel, validateLevel };
+if (typeof module !== 'undefined' && module.exports) module.exports = levelsApi;
+if (typeof window !== 'undefined') window.TodakThrowLevels = levelsApi;

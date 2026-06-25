@@ -28,6 +28,6 @@ function deserialize(str) {
   } catch (e) { return null; }
 }
 
-const api = { TOTAL_LEVELS, clamp, starsForAttempt, createProgress, recordClear, serialize, deserialize };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.TodakThrowScoring = api;
+const scoringApi = { TOTAL_LEVELS, clamp, starsForAttempt, createProgress, recordClear, serialize, deserialize };
+if (typeof module !== 'undefined' && module.exports) module.exports = scoringApi;
+if (typeof window !== 'undefined') window.TodakThrowScoring = scoringApi;

@@ -33,6 +33,6 @@ function trajectoryPoints(ox, oy, vx, vy, gravity, steps, dt) {
   return pts;
 }
 
-const api = { MAX_PULL, LAUNCH_SCALE, LOGICAL, clamp, pullVector, launchVelocity, trajectoryPoints };
-if (typeof module !== 'undefined' && module.exports) module.exports = api;
-if (typeof window !== 'undefined') window.TodakThrowTrajectory = api;
+const trajectoryApi = { MAX_PULL, LAUNCH_SCALE, LOGICAL, clamp, pullVector, launchVelocity, trajectoryPoints };
+if (typeof module !== 'undefined' && module.exports) module.exports = trajectoryApi;
+if (typeof window !== 'undefined') window.TodakThrowTrajectory = trajectoryApi;
