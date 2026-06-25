@@ -11,7 +11,7 @@ class GameScene extends Phaser.Scene {
 
   create(data) {
     const Levels = window.TodakThrowLevels;
-    this.level = Levels.getLevel((data && data.levelId) || 1);
+    this.level = Levels.getLevel((data && data.levelId) || 1) || Levels.getLevel(1);
     this.jarsLeft = this.level.jars;
     this.bearPos = { x: this.level.bear.x, y: this.level.bear.y };
 
@@ -36,6 +36,56 @@ class GameScene extends Phaser.Scene {
     // 시작 시 UIScene 띄우고 레벨 정보 전달
     this.scene.launch('UIScene');
     this.events.emit('level-init', { level: this.level, jarsLeft: this.jarsLeft });
+
+    this.state = 'AIMING';
+    this.aimGfx = this.add.graphics();
+    this.GRAV_PX = 0.5; // 궤적 미리보기용 중력 근사(시각 전용 튜닝값)
+    this.spawnJar();
+    this.input.on('pointerdown', this.onDown, this);
+    this.input.on('pointermove', this.onMove, this);
+    this.input.on('pointerup', this.onUp, this);
+  }
+
+  spawnJar() {
+    if (this.jar) this.jar.destroy();
+    this.jar = this.add.circle(this.bearPos.x, this.bearPos.y, 12, 0xe8a33d);
+    this.matter.add.gameObject(this.jar, { shape: 'circle', restitution: 0.4, friction: 0.5, label: 'jar' });
+    this.jar.body.gameObject = this.jar;
+    this.matter.body.setStatic(this.jar.body, true); // 발사 전 고정
+    this.state = 'AIMING';
+    this.dragging = false;
+  }
+
+  onDown(p) {
+    if (this.state !== 'AIMING') return;
+    const d = Phaser.Math.Distance.Between(p.x, p.y, this.bearPos.x, this.bearPos.y);
+    if (d < 60) this.dragging = true;
+  }
+
+  onMove(p) {
+    if (!this.dragging || this.state !== 'AIMING') return;
+    const T = window.TodakThrowTrajectory;
+    const pull = T.pullVector(this.bearPos.x, this.bearPos.y, p.x, p.y);
+    // 장전 꿀단지를 당긴 위치로(시각), 발사 미리보기 점선
+    this.matter.body.setPosition(this.jar.body, { x: this.bearPos.x - pull.dx, y: this.bearPos.y - pull.dy });
+    const v = T.launchVelocity(pull);
+    const pts = T.trajectoryPoints(this.bearPos.x, this.bearPos.y, v.vx * 12, v.vy * 12, this.GRAV_PX, 10, 1);
+    this.aimGfx.clear().fillStyle(0x8a5a1d, 0.5);
+    pts.forEach((pt) => this.aimGfx.fillCircle(pt.x, pt.y, 3));
+  }
+
+  onUp(p) {
+    if (!this.dragging || this.state !== 'AIMING') return;
+    this.dragging = false;
+    this.aimGfx.clear();
+    const T = window.TodakThrowTrajectory;
+    const pull = T.pullVector(this.bearPos.x, this.bearPos.y, p.x, p.y);
+    if (pull.dist < 8) { this.spawnJar(); return; } // 너무 짧으면 취소·재장전
+    const v = T.launchVelocity(pull);
+    this.matter.body.setPosition(this.jar.body, { x: this.bearPos.x, y: this.bearPos.y });
+    this.matter.body.setStatic(this.jar.body, false);
+    this.matter.body.setVelocity(this.jar.body, { x: v.vx, y: v.vy });
+    this.state = 'FLYING';
   }
 
   buildObstacle(o) {
