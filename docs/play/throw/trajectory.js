@@ -2,7 +2,7 @@
 // 토닥곰 던지기 — 궤적/발사 순수 수학 (Phaser 비의존, Node+브라우저 공용)
 
 const MAX_PULL = 120;       // 최대 당김 거리(px)
-const LAUNCH_SCALE = 0.18;  // 당김 px당 발사 속도
+const LAUNCH_SCALE = 0.22;  // 당김 px당 발사 속도 (Task10 튜닝: 0.18→0.22 발사력↑)
 const LOGICAL = { W: 360, H: 640 };
 
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }

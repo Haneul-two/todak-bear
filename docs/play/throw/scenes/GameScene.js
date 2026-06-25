@@ -25,8 +25,9 @@ class GameScene extends Phaser.Scene {
 
     // 항아리: 정적 센서 (충돌 X, 진입 감지만)
     const pot = this.level.pot;
-    this.add.circle(pot.x, pot.y, pot.r, 0xe8a33d, 0.25); // 시각 표시
-    this.add.circle(pot.x, pot.y + pot.r * 0.4, pot.r * 0.7, 0x8a5a1d, 0.0); // 입구 가이드(투명)
+    this.add.circle(pot.x, pot.y, pot.r, 0xe8a33d, 0.85); // 항아리(잘 보이게)
+    this.add.circle(pot.x, pot.y, pot.r, 0x8a5a1d).setStrokeStyle(4, 0x8a5a1d, 0.9).setFillStyle(0, 0); // 테두리 링
+    this.add.circle(pot.x, pot.y - pot.r * 0.55, pot.r * 0.85, 0x6b4419, 0.5); // 입구(짙은 안쪽)
     this.potSensor = this.matter.add.circle(pot.x, pot.y, pot.r * 0.6,
       { isStatic: true, isSensor: true, label: 'pot' });
 

@@ -5,7 +5,7 @@ const T = require('./trajectory.js');
 
 test('trajectory: 상수 노출', () => {
   assert.strictEqual(T.MAX_PULL, 120);
-  assert.strictEqual(T.LAUNCH_SCALE, 0.18);
+  assert.strictEqual(T.LAUNCH_SCALE, 0.22);
   assert.deepStrictEqual(T.LOGICAL, { W: 360, H: 640 });
 });
 
@@ -33,8 +33,8 @@ test('pullVector: 최대 당김 거리로 클램프', () => {
 
 test('launchVelocity: 당김 * 배율', () => {
   const v = T.launchVelocity({ dx: 100, dy: -50, dist: 111.8 });
-  assert.ok(Math.abs(v.vx - 18) < 1e-9);   // 100*0.18
-  assert.ok(Math.abs(v.vy - -9) < 1e-9);   // -50*0.18
+  assert.ok(Math.abs(v.vx - 22) < 1e-9);   // 100*0.22
+  assert.ok(Math.abs(v.vy - -11) < 1e-9);  // -50*0.22
 });
 
 test('trajectoryPoints: 포물선 샘플 개수·첫 점', () => {
