@@ -43,6 +43,7 @@
       game.registry.set('progress', progress);
       game.registry.set('levelId', progress.maxLevel || 1);
       game.registry.set('saveKey', SAVE_KEY);
+      window.game = game; // 디버그·스모크 테스트용 핸들
     }
   </script>
 </body>
