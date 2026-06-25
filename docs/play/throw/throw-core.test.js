@@ -90,3 +90,40 @@ test('scoring: 깨진/구버전 데이터는 null', () => {
   assert.strictEqual(S.deserialize(JSON.stringify({ v: 2 })), null);
   assert.strictEqual(S.deserialize(JSON.stringify({ v: 1 })), null); // stars 없음
 });
+
+const L = require('./levels.js');
+
+test('levels: 6개 고정, id 1..6 순서', () => {
+  assert.strictEqual(L.LEVELS.length, 6);
+  L.LEVELS.forEach((lv, i) => assert.strictEqual(lv.id, i + 1));
+});
+
+test('levels: 모든 레벨이 validateLevel 통과', () => {
+  for (const lv of L.LEVELS) assert.strictEqual(L.validateLevel(lv), true, `레벨 ${lv.id} 검증 실패`);
+});
+
+test('levels: getLevel', () => {
+  assert.strictEqual(L.getLevel(1).id, 1);
+  assert.strictEqual(L.getLevel(99), undefined);
+});
+
+test('levels: 레벨1은 장애물 없음, 모든 jars=3', () => {
+  assert.strictEqual(L.LEVELS[0].obstacles.length, 0);
+  for (const lv of L.LEVELS) assert.strictEqual(lv.jars, 3);
+});
+
+test('validateLevel: 화면 밖 좌표 거부', () => {
+  const bad = { id: 1, bear: { x: -5, y: 560 }, pot: { x: 250, y: 120, r: 36 }, jars: 3, obstacles: [] };
+  assert.strictEqual(L.validateLevel(bad), false);
+});
+
+test('validateLevel: 곰과 항아리 겹치면 거부', () => {
+  const bad = { id: 1, bear: { x: 250, y: 120 }, pot: { x: 250, y: 120, r: 36 }, jars: 3, obstacles: [] };
+  assert.strictEqual(L.validateLevel(bad), false);
+});
+
+test('validateLevel: 알 수 없는 장애물 타입 거부', () => {
+  const bad = { id: 1, bear: { x: 70, y: 560 }, pot: { x: 250, y: 120, r: 36 }, jars: 3,
+    obstacles: [{ type: 'bomb', x: 100, y: 300, w: 40, h: 40, static: true }] };
+  assert.strictEqual(L.validateLevel(bad), false);
+});
