@@ -8,6 +8,17 @@ class UIScene extends Phaser.Scene {
     this.game.scene.keys.GameScene.events.on('jars-changed', this.onJars, this);
     this.game.scene.keys.GameScene.events.on('cleared', this.onCleared, this);
     this.game.scene.keys.GameScene.events.on('failed', this.onFailed, this);
+    this.events.once('shutdown', this.cleanup, this);
+  }
+
+  // 씬 종료 시 GameScene 이벤트 리스너 해제(레벨 전환 반복 시 누수·중복 방지)
+  cleanup() {
+    const gs = this.game.scene.keys.GameScene;
+    if (!gs) return;
+    gs.events.off('level-init', this.onInit, this);
+    gs.events.off('jars-changed', this.onJars, this);
+    gs.events.off('cleared', this.onCleared, this);
+    gs.events.off('failed', this.onFailed, this);
   }
 
   onInit({ level, jarsLeft }) {
