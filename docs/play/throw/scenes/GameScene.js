@@ -44,6 +44,17 @@ class GameScene extends Phaser.Scene {
     this.input.on('pointerdown', this.onDown, this);
     this.input.on('pointermove', this.onMove, this);
     this.input.on('pointerup', this.onUp, this);
+
+    this.settleTimer = 0;
+    this.matter.world.on('collisionstart', (ev) => {
+      for (const pair of ev.pairs) {
+        const labels = [pair.bodyA.label, pair.bodyB.label];
+        if (labels.indexOf('pot') !== -1 && labels.indexOf('jar') !== -1 && this.state === 'FLYING') {
+          // 아래 방향 속도일 때만 인정(위로 튕겨 통과 방지)
+          if (this.jar.body.velocity.y > -0.5) this.onCleared();
+        }
+      }
+    });
   }
 
   spawnJar() {
@@ -86,6 +97,32 @@ class GameScene extends Phaser.Scene {
     this.matter.body.setStatic(this.jar.body, false);
     this.matter.body.setVelocity(this.jar.body, { x: v.vx, y: v.vy });
     this.state = 'FLYING';
+  }
+
+  update(time, dt) {
+    if (this.state !== 'FLYING') return;
+    const b = this.jar.body;
+    // 화면 밖(아래/좌우 멀리) → 실패
+    if (this.jar.y > 680 || this.jar.x < -40 || this.jar.x > 400) { this.onSettled(); return; }
+    const speed = Math.hypot(b.velocity.x, b.velocity.y);
+    if (speed < 0.4) { this.settleTimer += dt; if (this.settleTimer > 700) this.onSettled(); }
+    else this.settleTimer = 0;
+  }
+
+  onCleared() {
+    if (this.state === 'CLEARED') return;
+    this.state = 'CLEARED';
+    const jarsUsed = this.level.jars - this.jarsLeft + 1;
+    if (this.textures.exists('bear_happy')) this.bearImg.setTexture && this.bearImg.setTexture('bear_happy');
+    this.events.emit('cleared', { levelId: this.level.id, jarsUsed });
+  }
+
+  onSettled() {
+    this.settleTimer = 0;
+    this.jarsLeft -= 1;
+    this.events.emit('jars-changed', { jarsLeft: this.jarsLeft });
+    if (this.jarsLeft > 0) { this.spawnJar(); }
+    else { this.state = 'FAILED'; this.events.emit('failed', { levelId: this.level.id }); }
   }
 
   buildObstacle(o) {
