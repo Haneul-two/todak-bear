@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
 
     // 시작 시 UIScene 띄우고 레벨 정보 전달
     this.scene.launch('UIScene');
-    this.events.emit('level-init', { level: this.level, jarsLeft: this.jarsLeft });
+    this.time.delayedCall(0, () => this.events.emit('level-init', { level: this.level, jarsLeft: this.jarsLeft }));
 
     this.state = 'AIMING';
     this.aimGfx = this.add.graphics();
