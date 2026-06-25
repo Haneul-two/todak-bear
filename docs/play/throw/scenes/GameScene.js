@@ -118,6 +118,7 @@ class GameScene extends Phaser.Scene {
   }
 
   onSettled() {
+    if (this.state !== 'FLYING') return; // 한 틱 다중 호출/이탈+충돌 동시 발생 시 중복 차감 방지
     this.settleTimer = 0;
     this.jarsLeft -= 1;
     this.events.emit('jars-changed', { jarsLeft: this.jarsLeft });
