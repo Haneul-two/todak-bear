@@ -44,3 +44,49 @@ test('trajectoryPoints: 포물선 샘플 개수·첫 점', () => {
   assert.ok(Math.abs(pts[0].x - 10) < 1e-9);
   assert.ok(Math.abs(pts[0].y - -9.5) < 1e-9);
 });
+
+const S = require('./scoring.js');
+
+test('scoring: 시도수→별점 (1발=3, 2발=2, 3발=1, 그 이상=1)', () => {
+  assert.strictEqual(S.starsForAttempt(1), 3);
+  assert.strictEqual(S.starsForAttempt(2), 2);
+  assert.strictEqual(S.starsForAttempt(3), 1);
+  assert.strictEqual(S.starsForAttempt(4), 1);
+});
+
+test('scoring: createProgress 기본값', () => {
+  const p = S.createProgress();
+  assert.strictEqual(p.v, 1);
+  assert.strictEqual(p.maxLevel, 1);
+  assert.deepStrictEqual(p.stars, {});
+});
+
+test('scoring: recordClear 별점 갱신·해금', () => {
+  const p = S.createProgress();
+  S.recordClear(p, 1, 2);          // 레벨1, 2발 → ⭐⭐
+  assert.strictEqual(p.stars[1], 2);
+  assert.strictEqual(p.maxLevel, 2);
+  S.recordClear(p, 1, 1);          // 레벨1 재도전 1발 → ⭐⭐⭐ (max)
+  assert.strictEqual(p.stars[1], 3);
+  S.recordClear(p, 1, 3);          // 더 나쁜 점수는 무시
+  assert.strictEqual(p.stars[1], 3);
+});
+
+test('scoring: maxLevel은 TOTAL_LEVELS로 클램프', () => {
+  const p = S.createProgress();
+  S.recordClear(p, 6, 1);
+  assert.strictEqual(p.maxLevel, 6);
+});
+
+test('scoring: serialize/deserialize 라운드트립', () => {
+  const p = S.createProgress();
+  S.recordClear(p, 1, 1);
+  const r = S.deserialize(S.serialize(p));
+  assert.deepStrictEqual(r, p);
+});
+
+test('scoring: 깨진/구버전 데이터는 null', () => {
+  assert.strictEqual(S.deserialize('{bad'), null);
+  assert.strictEqual(S.deserialize(JSON.stringify({ v: 2 })), null);
+  assert.strictEqual(S.deserialize(JSON.stringify({ v: 1 })), null); // stars 없음
+});
