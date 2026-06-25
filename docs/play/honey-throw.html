@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>🐻 토닥곰 던지기</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #2b2622;
+    display: flex; align-items: center; justify-content: center; overscroll-behavior: none;
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  #wrap { width: min(92vw, 360px); aspect-ratio: 360 / 640; }
+  canvas { border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  #fallback { color: #f3e9d8; text-align: center; }
+</style>
+</head>
+<body>
+  <div id="wrap"><div id="fallback" hidden>게임을 불러오지 못했어요 🐻</div></div>
+  <script src="vendor/phaser.min.js"
+    onerror="document.getElementById('fallback').hidden=false"></script>
+  <script src="throw/trajectory.js"></script>
+  <script src="throw/scoring.js"></script>
+  <script src="throw/levels.js"></script>
+  <script src="throw/scenes/BootScene.js"></script>
+  <script src="throw/scenes/GameScene.js"></script>
+  <script src="throw/scenes/UIScene.js"></script>
+  <script>
+    if (window.Phaser) {
+      const SAVE_KEY = 'todak.throw.v1';
+      let progress = null;
+      try { const raw = localStorage.getItem(SAVE_KEY); progress = raw ? window.TodakThrowScoring.deserialize(raw) : null; }
+      catch (e) {}
+      if (!progress) progress = window.TodakThrowScoring.createProgress();
+
+      const game = new Phaser.Game({
+        type: Phaser.AUTO,
+        parent: 'wrap',
+        width: 360, height: 640,
+        backgroundColor: '#FBF3E4',
+        scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+        physics: { default: 'matter', matter: { gravity: { y: 1 }, debug: false } },
+        scene: [BootScene, GameScene, UIScene],
+      });
+      game.registry.set('progress', progress);
+      game.registry.set('levelId', progress.maxLevel || 1);
+      game.registry.set('saveKey', SAVE_KEY);
+    }
+  </script>
+</body>
+</html>
