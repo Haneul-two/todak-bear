@@ -29,8 +29,12 @@ class UIScene extends Phaser.Scene {
     this.bar = this.add.container(0, 0);
     this.bar.add(this.add.text(12, 10, 'Lv ' + level.id, { color: '#5a4a36', fontSize: '18px', fontStyle: 'bold' }));
     this.bar.add(this.add.text(120, 12, '★'.repeat(best) + '☆'.repeat(3 - best), { color: '#e8a33d', fontSize: '16px' }));
-    this.jarText = this.add.text(348, 12, '🍯'.repeat(jarsLeft), { fontSize: '16px' }).setOrigin(1, 0);
+    this.jarText = this.add.text(225, 12, '🍯'.repeat(jarsLeft), { fontSize: '16px' }).setOrigin(0, 0);
     this.bar.add(this.jarText);
+    // 현재 레벨 재시작 버튼(별점 갱신용 재도전 — 단지 소진 없이 즉시 다시). registry.levelId=현재 레벨 유지.
+    const restart = this.add.text(348, 12, '↺ 다시', { color: '#8a5a36', fontSize: '15px' }).setOrigin(1, 0).setInteractive();
+    restart.on('pointerdown', () => { this.scene.stop('UIScene'); this.scene.start('BootScene'); });
+    this.bar.add(restart);
     if (level.hint) {
       this.hint = this.add.text(180, 600, level.hint, { color: '#5a4a36', fontSize: '13px' }).setOrigin(0.5);
     }

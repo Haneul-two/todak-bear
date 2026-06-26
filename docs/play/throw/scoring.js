@@ -24,7 +24,13 @@ function deserialize(str) {
   try {
     const o = JSON.parse(str);
     if (!o || o.v !== 1 || typeof o.maxLevel !== 'number' || typeof o.stars !== 'object' || o.stars === null) return null;
-    return { v: 1, maxLevel: clamp(o.maxLevel, 1, TOTAL_LEVELS), stars: o.stars };
+    // 별점 값 위생 처리: 변조/손상된 범위밖 값이 UI(★repeat)서 RangeError 내지 않도록 0~3 클램프
+    const stars = {};
+    for (const k in o.stars) {
+      const s = o.stars[k];
+      if (typeof s === 'number' && isFinite(s)) stars[k] = clamp(Math.round(s), 0, 3);
+    }
+    return { v: 1, maxLevel: clamp(o.maxLevel, 1, TOTAL_LEVELS), stars };
   } catch (e) { return null; }
 }
 

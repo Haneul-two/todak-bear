@@ -91,6 +91,15 @@ test('scoring: 깨진/구버전 데이터는 null', () => {
   assert.strictEqual(S.deserialize(JSON.stringify({ v: 1 })), null); // stars 없음
 });
 
+test('scoring: 변조된 별점 값은 0~3으로 위생처리, 비정상값은 버림', () => {
+  const r = S.deserialize(JSON.stringify({ v: 1, maxLevel: 2, stars: { 1: 99, 2: -5, 3: 2.4, 4: 'x', 5: NaN } }));
+  assert.strictEqual(r.stars['1'], 3);   // 99 → 3
+  assert.strictEqual(r.stars['2'], 0);   // -5 → 0
+  assert.strictEqual(r.stars['3'], 2);   // 2.4 → 2(반올림)
+  assert.strictEqual('4' in r.stars, false); // 'x' 버림
+  assert.strictEqual('5' in r.stars, false); // NaN 버림
+});
+
 const L = require('./levels.js');
 
 test('levels: 6개 고정, id 1..6 순서', () => {

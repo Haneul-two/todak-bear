@@ -81,7 +81,7 @@ class GameScene extends Phaser.Scene {
     // 장전 꿀단지를 당긴 위치로(시각), 발사 미리보기 점선
     this.matter.body.setPosition(this.jar.body, { x: this.bearPos.x - pull.dx, y: this.bearPos.y - pull.dy });
     const v = T.launchVelocity(pull);
-    // 실제 Matter 비행과 일치하는 미리보기(매 3스텝 14점). 이전 *12 배수는 궤적을 화면밖으로 보내 무의미했음.
+    // 실제 Matter 비행과 일치하는 미리보기(매 3스텝 10점, 상승 아크). 이전 *12 배수는 궤적을 화면밖으로 보내 무의미했음.
     const pts = T.trajectoryPoints(this.bearPos.x, this.bearPos.y, v.vx, v.vy, this.GRAV_PX, 10, 3);
     this.aimGfx.clear().fillStyle(0x8a5a1d, 0.5);
     pts.forEach((pt) => this.aimGfx.fillCircle(pt.x, pt.y, 3));
