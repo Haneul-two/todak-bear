@@ -6,26 +6,26 @@ const OBSTACLE_TYPES = ['log', 'box', 'rock'];
 
 // 곰은 아래쪽, 항아리는 위쪽(살짝 대각). 한 기믹씩 난이도 상승.
 const LEVELS = [
-  { id: 1, bear: { x: 70, y: 560 }, pot: { x: 250, y: 120, r: 38 }, jars: 3,
+  { id: 1, bear: { x: 70, y: 500 }, pot: { x: 250, y: 120, r: 38 }, jars: 3,
     obstacles: [], hint: '곰을 당겼다 놓아 꿀단지를 항아리에 넣어요' },
-  { id: 2, bear: { x: 60, y: 560 }, pot: { x: 280, y: 130, r: 36 }, jars: 3,
+  { id: 2, bear: { x: 60, y: 500 }, pot: { x: 280, y: 130, r: 36 }, jars: 3,
     obstacles: [ { type: 'rock', x: 180, y: 360, w: 44, h: 44, static: true } ],
     hint: '바위를 비껴 던져요' },
-  { id: 3, bear: { x: 60, y: 560 }, pot: { x: 270, y: 120, r: 36 }, jars: 3,
+  { id: 3, bear: { x: 60, y: 500 }, pot: { x: 270, y: 120, r: 36 }, jars: 3,
     obstacles: [ { type: 'log', x: 190, y: 380, w: 100, h: 24, static: true } ],
     hint: '통나무를 맞춰 밀어내요' },
-  { id: 4, bear: { x: 60, y: 560 }, pot: { x: 260, y: 130, r: 34 }, jars: 3,
+  { id: 4, bear: { x: 60, y: 500 }, pot: { x: 260, y: 130, r: 34 }, jars: 3,
     obstacles: [
       { type: 'box', x: 250, y: 300, w: 44, h: 44, static: true },
       { type: 'box', x: 250, y: 256, w: 44, h: 44, static: true } ],
     hint: '쌓인 상자를 무너뜨려요' },
-  { id: 5, bear: { x: 55, y: 560 }, pot: { x: 285, y: 120, r: 32 }, jars: 3,
+  { id: 5, bear: { x: 55, y: 500 }, pot: { x: 285, y: 120, r: 32 }, jars: 3,
     obstacles: [
       { type: 'rock', x: 200, y: 380, w: 44, h: 44, static: true },
       { type: 'box',  x: 250, y: 300, w: 44, h: 44, static: true },
       { type: 'box',  x: 250, y: 256, w: 44, h: 44, static: true } ],
     hint: '복합 벽을 정확히 뚫어요' },
-  { id: 6, bear: { x: 60, y: 560 }, pot: { x: 70, y: 120, r: 30 }, jars: 3,
+  { id: 6, bear: { x: 60, y: 500 }, pot: { x: 70, y: 120, r: 30 }, jars: 3,
     obstacles: [
       { type: 'rock', x: 150, y: 260, w: 44, h: 120, static: true },
       { type: 'log',  x: 120, y: 430, w: 110, h: 24, static: true } ],

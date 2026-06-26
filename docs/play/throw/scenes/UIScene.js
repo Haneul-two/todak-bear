@@ -66,7 +66,7 @@ class UIScene extends Phaser.Scene {
   showOverlay(msg, btnLabel, onBtn) {
     const g = this.add.container(0, 0);
     g.add(this.add.rectangle(180, 320, 360, 640, 0x2b2622, 0.55));
-    g.add(this.add.text(180, 280, msg, { color: '#fff', fontSize: '22px', fontStyle: 'bold' }).setOrigin(0.5));
+    g.add(this.add.text(180, 280, msg, { color: '#fff', fontSize: '22px', fontStyle: 'bold', padding: { top: 6, bottom: 2 } }).setOrigin(0.5));
     const btn = this.add.text(180, 360, '  ' + btnLabel + '  ', { color: '#5a4a36', backgroundColor: '#FBF3E4', fontSize: '18px', padding: { x: 14, y: 8 } }).setOrigin(0.5).setInteractive();
     btn.on('pointerdown', onBtn);
     g.add(btn);
