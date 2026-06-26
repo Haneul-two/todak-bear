@@ -51,8 +51,8 @@ class GameScene extends Phaser.Scene {
       for (const pair of ev.pairs) {
         const labels = [pair.bodyA.label, pair.bodyB.label];
         if (labels.indexOf('pot') !== -1 && labels.indexOf('jar') !== -1 && this.state === 'FLYING') {
-          // 아래 방향 속도일 때만 인정(위로 튕겨 통과 방지)
-          if (this.jar.body.velocity.y > -0.5) this.onCleared();
+          // 항아리 입구 센서에 들어오면 성공(상승 중 통과도 인정 — 높은 항아리 도달성 위해 완화)
+          this.onCleared();
         }
       }
     });
@@ -81,7 +81,8 @@ class GameScene extends Phaser.Scene {
     // 장전 꿀단지를 당긴 위치로(시각), 발사 미리보기 점선
     this.matter.body.setPosition(this.jar.body, { x: this.bearPos.x - pull.dx, y: this.bearPos.y - pull.dy });
     const v = T.launchVelocity(pull);
-    const pts = T.trajectoryPoints(this.bearPos.x, this.bearPos.y, v.vx * 12, v.vy * 12, this.GRAV_PX, 10, 1);
+    // 실제 Matter 비행과 일치하는 미리보기(매 3스텝 14점). 이전 *12 배수는 궤적을 화면밖으로 보내 무의미했음.
+    const pts = T.trajectoryPoints(this.bearPos.x, this.bearPos.y, v.vx, v.vy, this.GRAV_PX, 10, 3);
     this.aimGfx.clear().fillStyle(0x8a5a1d, 0.5);
     pts.forEach((pt) => this.aimGfx.fillCircle(pt.x, pt.y, 3));
   }
